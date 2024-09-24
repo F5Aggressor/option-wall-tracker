@@ -18,7 +18,7 @@ async function getOptionsData() {
         if (!priceData || !priceData.c) {
             throw new Error("Failed to retrieve stock price data.");
         }
-        const currentPrice = priceData.c; // 'c' is the current price
+        const currentPrice = priceData.c;
         console.log('Current Price:', currentPrice);
 
         // Fetch options chain from Finnhub.io
@@ -32,6 +32,12 @@ async function getOptionsData() {
             return; // Stop further processing if no options data
         }
 
+        // Log the full structure of each option to investigate
+        optionsData.data.forEach((option, index) => {
+            console.log(`Option ${index}:`, option);
+        });
+
+        // Try extracting strikes, calls, and puts (temporary adjustments)
         const strikes = optionsData.data.map(option => option.strike);
         const callsOI = optionsData.data.filter(option => option.type === 'CALL').map(option => option.openInterest);
         const putsOI = optionsData.data.filter(option => option.type === 'PUT').map(option => option.openInterest);
