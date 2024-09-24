@@ -1,29 +1,5 @@
 let currentChart = null; // Store the chart instance
 
-document.addEventListener('DOMContentLoaded', (event) => {
-    const ctx = document.getElementById('optionsChart').getContext('2d');
-
-    // Basic test chart to check if Chart.js is working
-    const testChart = new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: ['Test 1', 'Test 2', 'Test 3'],
-            datasets: [{
-                label: 'Test Data',
-                data: [10, 20, 30],
-                backgroundColor: 'rgba(75, 192, 192, 0.5)',
-                borderColor: 'rgba(75, 192, 192, 1)',
-                borderWidth: 1
-            }]
-        },
-        options: {
-            scales: {
-                y: { beginAtZero: true }
-            }
-        }
-    });
-});
-
 async function getOptionsData() {
     const ticker = document.getElementById('stockTicker').value;
     if (!ticker) {
@@ -85,9 +61,9 @@ async function getOptionsData() {
 
         // Generate chart data
         const chartData = {
-            strikes: strikeRange,
-            callsOI: chartCallsOI,
-            putsOI: chartPutsOI
+            strikes: strikeRange, // Use the full strike range
+            callsOI: chartCallsOI, // Calls OI mapped to strike range
+            putsOI: chartPutsOI // Puts OI mapped to strike range
         };
 
         renderChart(chartData, currentPrice);
@@ -109,19 +85,19 @@ function renderChart(data, currentPrice) {
     currentChart = new Chart(ctx, {
         type: 'bar',
         data: {
-            labels: data.strikes,
+            labels: data.strikes, // Strike prices dynamically filtered based on current price
             datasets: [
                 {
                     label: 'Calls Open Interest',
                     data: data.callsOI,
-                    backgroundColor: 'rgba(75, 192, 192, 0.5)',
+                    backgroundColor: 'rgba(75, 192, 192, 0.5)', // Light blue for calls
                     borderColor: 'rgba(75, 192, 192, 1)',
                     borderWidth: 1
                 },
                 {
                     label: 'Puts Open Interest',
                     data: data.putsOI,
-                    backgroundColor: 'rgba(255, 99, 132, 0.5)',
+                    backgroundColor: 'rgba(255, 99, 132, 0.5)', // Light red for puts
                     borderColor: 'rgba(255, 99, 132, 1)',
                     borderWidth: 1
                 }
@@ -130,10 +106,10 @@ function renderChart(data, currentPrice) {
         options: {
             scales: {
                 x: {
-                    beginAtZero: false,
+                    beginAtZero: false, // Show strike prices based on dynamic range
                 },
                 y: {
-                    beginAtZero: true
+                    beginAtZero: true // Bars start from 0
                 }
             },
             plugins: {
