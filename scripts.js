@@ -1,6 +1,8 @@
+let currentChart = null; // Store the chart instance
+
 document.addEventListener('DOMContentLoaded', (event) => {
     const ctx = document.getElementById('optionsChart').getContext('2d');
-    
+
     // Basic test chart to check if Chart.js is working
     const testChart = new Chart(ctx, {
         type: 'bar',
@@ -22,7 +24,6 @@ document.addEventListener('DOMContentLoaded', (event) => {
     });
 });
 
-// The rest of your code can go here after confirming the test chart works
 async function getOptionsData() {
     const ticker = document.getElementById('stockTicker').value;
     if (!ticker) {
@@ -34,6 +35,7 @@ async function getOptionsData() {
 
     try {
         // Fetch stock price from Finnhub.io
+        console.log("Fetching stock price...");
         const priceResponse = await fetch(`https://finnhub.io/api/v1/quote?symbol=${ticker}&token=${apiKey}`);
         const priceData = await priceResponse.json();
         if (!priceData || !priceData.c) {
@@ -42,6 +44,7 @@ async function getOptionsData() {
         const currentPrice = priceData.c;
 
         // Fetch options chain from Finnhub.io
+        console.log("Fetching options chain...");
         const optionsResponse = await fetch(`https://finnhub.io/api/v1/stock/option-chain?symbol=${ticker}&token=${apiKey}`);
         const optionsData = await optionsResponse.json();
 
@@ -51,22 +54,25 @@ async function getOptionsData() {
         }
 
         // Extracting CALL and PUT options for the first expiration date
-        const firstOption = optionsData.data[0];
+        const firstOption = optionsData.data[0]; // First expiration date's options
         const callOptions = firstOption.options.CALL;
         const putOptions = firstOption.options.PUT;
 
-        const minStrike = Math.floor((currentPrice - 50) / 5) * 5; 
+        // Generate strikes 50 points below and above the current price
+        const minStrike = Math.floor((currentPrice - 50) / 5) * 5; // Ensure strikes are multiples of 5
         const maxStrike = Math.ceil((currentPrice + 50) / 5) * 5;
         const strikeRange = [];
 
         for (let strike = minStrike; strike <= maxStrike; strike += 2.5) {
-            strikeRange.push(strike);
+            strikeRange.push(strike); // Push strikes in 2.5 increments
         }
 
+        // Map strikes with calls and puts open interest
         const strikes = callOptions.map(option => option.strike);
         const callsOI = callOptions.map(option => option.openInterest);
         const putsOI = putOptions.map(option => option.openInterest);
 
+        // Initialize arrays for calls and puts open interest with 0 values
         const chartCallsOI = strikeRange.map(strike => {
             const index = strikes.indexOf(strike);
             return index !== -1 ? callsOI[index] : 0;
@@ -77,6 +83,7 @@ async function getOptionsData() {
             return index !== -1 ? putsOI[index] : 0;
         });
 
+        // Generate chart data
         const chartData = {
             strikes: strikeRange,
             callsOI: chartCallsOI,
@@ -93,10 +100,12 @@ async function getOptionsData() {
 function renderChart(data, currentPrice) {
     const ctx = document.getElementById('optionsChart').getContext('2d');
 
+    // Destroy the old chart instance if it exists
     if (currentChart) {
         currentChart.destroy();
     }
 
+    // Create a new chart instance with a broader X-axis range
     currentChart = new Chart(ctx, {
         type: 'bar',
         data: {
@@ -140,16 +149,4 @@ function renderChart(data, currentPrice) {
                                 enabled: true,
                                 content: `Current Price: $${currentPrice}`,
                                 position: 'end',
-                                backgroundColor: 'rgba(0,0,0,0.7)',
-                                color: '#fff',
-                                padding: 6
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    });
-}
-
-
+                                backgroundColor: 'rgba(0
