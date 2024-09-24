@@ -49,9 +49,13 @@ async function getOptionsData() {
         console.log("Calls Open Interest Extracted:", callsOI);
         console.log("Puts Open Interest Extracted:", putsOI);
 
-        // Filter strikes to a broader range (from 200 to 300)
-        const limitedStrikes = strikes.filter(strike => strike >= 200 && strike <= 300);
-        console.log("Limited Strikes (from 200 to 300):", limitedStrikes);
+        // Filter strikes based on dynamic range (50 points above and below current price)
+        const minStrike = currentPrice - 50;
+        const maxStrike = currentPrice + 50;
+
+        // Filter strikes within the range of (currentPrice - 50) to (currentPrice + 50)
+        const limitedStrikes = strikes.filter(strike => strike >= minStrike && strike <= maxStrike);
+        console.log(`Limited Strikes (from ${minStrike} to ${maxStrike}):`, limitedStrikes);
 
         // Ensure the calls and puts open interest is sliced to match the limited strikes
         const limitedCallsOI = callsOI.slice(0, limitedStrikes.length);
@@ -82,11 +86,11 @@ function renderChart(data, currentPrice) {
         currentChart.destroy();
     }
 
-    // Create a new chart instance with a broader X-axis range and larger canvas
+    // Create a new chart instance with the current price centered and extended range
     currentChart = new Chart(ctx, {
         type: 'bar',
         data: {
-            labels: data.strikes, // Strike prices (expanded from 200 to 300)
+            labels: data.strikes, // Strike prices dynamically filtered based on current price
             datasets: [
                 {
                     label: 'Calls Open Interest',
@@ -107,7 +111,7 @@ function renderChart(data, currentPrice) {
         options: {
             scales: {
                 x: {
-                    beginAtZero: false, // Show strike prices from 200 to 300
+                    beginAtZero: false, // Show strike prices based on dynamic range
                 },
                 y: {
                     beginAtZero: true // Bars start from 0
