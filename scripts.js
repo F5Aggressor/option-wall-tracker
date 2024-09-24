@@ -33,23 +33,23 @@ async function getOptionsData() {
         }
 
         // Extracting CALL and PUT options for the first expiration date
-        const firstOption = optionsData.data[0]; // We'll just take the first expiration date's options for now
+        const firstOption = optionsData.data[0]; // First expiration date's options
         const callOptions = firstOption.options.CALL;
         const putOptions = firstOption.options.PUT;
 
-        console.log("Call Options:", callOptions);
-        console.log("Put Options:", putOptions);
+        console.log("Call Options Full Data:", callOptions);
+        console.log("Put Options Full Data:", putOptions);
 
         // Extract strikes, calls open interest, and puts open interest
         const strikes = callOptions.map(option => option.strike);
         const callsOI = callOptions.map(option => option.openInterest);
         const putsOI = putOptions.map(option => option.openInterest);
 
-        console.log("Strikes:", strikes);
-        console.log("Calls Open Interest:", callsOI);
-        console.log("Puts Open Interest:", putsOI);
+        console.log("Strikes Extracted:", strikes);
+        console.log("Calls Open Interest Extracted:", callsOI);
+        console.log("Puts Open Interest Extracted:", putsOI);
 
-        // Find 5 strikes above and below the current price
+        // Filter strikes to 5 above and 5 below the current price
         const limitedStrikes = strikes.filter(strike => Math.abs(strike - currentPrice) <= 5);
         console.log("Limited Strikes (around current price):", limitedStrikes);
 
@@ -62,13 +62,13 @@ async function getOptionsData() {
         const limitedCallsOI = callsOI.slice(0, limitedStrikes.length);
         const limitedPutsOI = putsOI.slice(0, limitedStrikes.length);
 
-        console.log("Limited Calls Open Interest:", limitedCallsOI);
-        console.log("Limited Puts Open Interest:", limitedPutsOI);
+        console.log("Limited Calls Open Interest after slicing:", limitedCallsOI);
+        console.log("Limited Puts Open Interest after slicing:", limitedPutsOI);
 
-        // Generate chart data (matching strikes length)
+        // Generate chart data
         const chartData = {
             strikes: limitedStrikes,
-            callsOI: limitedCallsOI, // Match to strikes length
+            callsOI: limitedCallsOI,
             putsOI: limitedPutsOI
         };
 
@@ -142,4 +142,3 @@ function renderChart(data, currentPrice) {
         }
     });
 }
-
