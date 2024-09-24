@@ -32,7 +32,7 @@ async function getOptionsData() {
             return; // Stop further processing if no options data
         }
 
-        // Extracting CALL and PUT options
+        // Extracting CALL and PUT options for the first expiration date
         const firstOption = optionsData.data[0]; // We'll just take the first expiration date's options for now
         const callOptions = firstOption.options.CALL;
         const putOptions = firstOption.options.PUT;
@@ -49,19 +49,27 @@ async function getOptionsData() {
         console.log("Calls Open Interest:", callsOI);
         console.log("Puts Open Interest:", putsOI);
 
-        // Limit to 5 strikes above and 5 strikes below the current price
+        // Find 5 strikes above and below the current price
         const limitedStrikes = strikes.filter(strike => Math.abs(strike - currentPrice) <= 5);
-        console.log("Limited Strikes:", limitedStrikes);
+        console.log("Limited Strikes (around current price):", limitedStrikes);
 
-        // Insert the current price into the center of the strikes array
+        // Insert the current price into the middle of the strikes array
         const middleIndex = Math.floor(limitedStrikes.length / 2);
         limitedStrikes.splice(middleIndex, 0, currentPrice); // Insert current price at the center
+        console.log("Strikes with current price centered:", limitedStrikes);
+
+        // Ensure the calls and puts open interest is sliced to match the limited strikes
+        const limitedCallsOI = callsOI.slice(0, limitedStrikes.length);
+        const limitedPutsOI = putsOI.slice(0, limitedStrikes.length);
+
+        console.log("Limited Calls Open Interest:", limitedCallsOI);
+        console.log("Limited Puts Open Interest:", limitedPutsOI);
 
         // Generate chart data (matching strikes length)
         const chartData = {
             strikes: limitedStrikes,
-            callsOI: callsOI.slice(0, limitedStrikes.length), // Match to strikes length
-            putsOI: putsOI.slice(0, limitedStrikes.length)
+            callsOI: limitedCallsOI, // Match to strikes length
+            putsOI: limitedPutsOI
         };
 
         renderChart(chartData, currentPrice);
