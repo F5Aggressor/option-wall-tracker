@@ -28,7 +28,8 @@ async function getOptionsData() {
         console.log("Options Chain Response:", optionsData);
 
         if (!optionsData || !optionsData.data || optionsData.data.length === 0) {
-            throw new Error("Failed to retrieve options data.");
+            alert("No options data available for this ticker.");
+            return; // Stop further processing if no options data
         }
 
         const strikes = optionsData.data.map(option => option.strike);
@@ -42,6 +43,10 @@ async function getOptionsData() {
         // Limit to a range around the current price (5 strikes above and below)
         const limitedStrikes = strikes.filter(strike => Math.abs(strike - currentPrice) <= 5);
         console.log("Limited Strikes:", limitedStrikes);
+
+        // Insert the current price into the center of the strikes array
+        const middleIndex = Math.floor(limitedStrikes.length / 2);
+        limitedStrikes.splice(middleIndex, 0, currentPrice); // Insert current price at the center
 
         // Generate chart data
         const chartData = {
@@ -65,7 +70,7 @@ function renderChart(data, currentPrice) {
         currentChart.destroy();
     }
 
-    // Create a new chart instance
+    // Create a new chart instance with the current price centered
     currentChart = new Chart(ctx, {
         type: 'bar',
         data: {
