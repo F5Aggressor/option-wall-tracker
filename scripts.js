@@ -149,4 +149,14 @@ function renderChart(data, currentPrice) {
                                 enabled: true,
                                 content: `Current Price: $${currentPrice}`,
                                 position: 'end',
-                                backgroundColor: 'rgba(0
+                                backgroundColor: 'rgba(0,0,0,0.7)',
+                                color: '#fff',
+                                padding: 6
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
