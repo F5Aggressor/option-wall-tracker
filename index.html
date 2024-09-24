@@ -4,18 +4,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Option Wall Tracker</title>
+    <!-- Link your CSS if needed -->
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="container">
         <h1>Option Wall Tracker</h1>
-        <input type="text" id="stockTicker" placeholder="Enter Stock Ticker" />
-        <button onclick="getOptionsData()">Submit</button>
         <div>
-            <canvas id="optionsChart"></canvas>
+            <input type="text" id="stockTicker" placeholder="Enter stock ticker">
+            <button onclick="getOptionsData()">Submit</button>
         </div>
+
+        <!-- Place the updated canvas here -->
+        <canvas id="optionsChart" width="1200" height="600"></canvas> <!-- Larger canvas for the chart -->
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Link your JS at the bottom of the body -->
     <script src="scripts.js"></script>
 </body>
 </html>
+
