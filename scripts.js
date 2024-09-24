@@ -151,3 +151,5 @@ function renderChart(data, currentPrice) {
         }
     });
 }
+
+
