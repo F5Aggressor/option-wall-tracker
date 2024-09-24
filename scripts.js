@@ -142,3 +142,4 @@ function renderChart(data, currentPrice) {
         }
     });
 }
+
