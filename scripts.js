@@ -40,35 +40,43 @@ async function getOptionsData() {
         console.log("Call Options Full Data:", callOptions);
         console.log("Put Options Full Data:", putOptions);
 
-        // Extract strikes, calls open interest, and puts open interest
+        // Generate strikes 50 points below and above the current price
+        const minStrike = Math.floor((currentPrice - 50) / 5) * 5; // Ensure strikes are multiples of 5
+        const maxStrike = Math.ceil((currentPrice + 50) / 5) * 5;
+        const strikeRange = [];
+
+        for (let strike = minStrike; strike <= maxStrike; strike += 2.5) {
+            strikeRange.push(strike); // Push strikes in 2.5 increments
+        }
+
+        console.log(`Strike Range (from ${minStrike} to ${maxStrike}):`, strikeRange);
+
+        // Map strikes with calls and puts open interest
         const strikes = callOptions.map(option => option.strike);
         const callsOI = callOptions.map(option => option.openInterest);
         const putsOI = putOptions.map(option => option.openInterest);
 
-        console.log("Strikes Extracted:", strikes);
-        console.log("Calls Open Interest Extracted:", callsOI);
-        console.log("Puts Open Interest Extracted:", putsOI);
+        console.log("Available Strikes from API:", strikes);
 
-        // Filter strikes based on dynamic range (50 points above and below current price)
-        const minStrike = currentPrice - 50;
-        const maxStrike = currentPrice + 50;
+        // Initialize arrays for calls and puts open interest with 0 values
+        const chartCallsOI = strikeRange.map(strike => {
+            const index = strikes.indexOf(strike);
+            return index !== -1 ? callsOI[index] : 0;
+        });
 
-        // Filter strikes within the range of (currentPrice - 50) to (currentPrice + 50)
-        const limitedStrikes = strikes.filter(strike => strike >= minStrike && strike <= maxStrike);
-        console.log(`Limited Strikes (from ${minStrike} to ${maxStrike}):`, limitedStrikes);
+        const chartPutsOI = strikeRange.map(strike => {
+            const index = strikes.indexOf(strike);
+            return index !== -1 ? putsOI[index] : 0;
+        });
 
-        // Ensure the calls and puts open interest is sliced to match the limited strikes
-        const limitedCallsOI = callsOI.slice(0, limitedStrikes.length);
-        const limitedPutsOI = putsOI.slice(0, limitedStrikes.length);
-
-        console.log("Limited Calls Open Interest after slicing:", limitedCallsOI);
-        console.log("Limited Puts Open Interest after slicing:", limitedPutsOI);
+        console.log("Chart Calls Open Interest:", chartCallsOI);
+        console.log("Chart Puts Open Interest:", chartPutsOI);
 
         // Generate chart data
         const chartData = {
-            strikes: limitedStrikes,
-            callsOI: limitedCallsOI,
-            putsOI: limitedPutsOI
+            strikes: strikeRange, // Use the full strike range
+            callsOI: chartCallsOI, // Calls OI mapped to strike range
+            putsOI: chartPutsOI // Puts OI mapped to strike range
         };
 
         renderChart(chartData, currentPrice);
@@ -86,7 +94,7 @@ function renderChart(data, currentPrice) {
         currentChart.destroy();
     }
 
-    // Create a new chart instance with the current price centered and extended range
+    // Create a new chart instance with a broader X-axis range and larger canvas
     currentChart = new Chart(ctx, {
         type: 'bar',
         data: {
