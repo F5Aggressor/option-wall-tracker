@@ -49,14 +49,9 @@ async function getOptionsData() {
         console.log("Calls Open Interest Extracted:", callsOI);
         console.log("Puts Open Interest Extracted:", putsOI);
 
-        // Filter strikes to 5 above and 5 below the current price
-        const limitedStrikes = strikes.filter(strike => Math.abs(strike - currentPrice) <= 5);
-        console.log("Limited Strikes (around current price):", limitedStrikes);
-
-        // Insert the current price into the middle of the strikes array
-        const middleIndex = Math.floor(limitedStrikes.length / 2);
-        limitedStrikes.splice(middleIndex, 0, currentPrice); // Insert current price at the center
-        console.log("Strikes with current price centered:", limitedStrikes);
+        // Filter strikes to a broader range (from 200 to 300)
+        const limitedStrikes = strikes.filter(strike => strike >= 200 && strike <= 300);
+        console.log("Limited Strikes (from 200 to 300):", limitedStrikes);
 
         // Ensure the calls and puts open interest is sliced to match the limited strikes
         const limitedCallsOI = callsOI.slice(0, limitedStrikes.length);
@@ -87,11 +82,11 @@ function renderChart(data, currentPrice) {
         currentChart.destroy();
     }
 
-    // Create a new chart instance with the current price centered
+    // Create a new chart instance with a broader X-axis range and larger canvas
     currentChart = new Chart(ctx, {
         type: 'bar',
         data: {
-            labels: data.strikes, // Strike prices (including current price in the middle)
+            labels: data.strikes, // Strike prices (expanded from 200 to 300)
             datasets: [
                 {
                     label: 'Calls Open Interest',
@@ -112,7 +107,7 @@ function renderChart(data, currentPrice) {
         options: {
             scales: {
                 x: {
-                    beginAtZero: false, // Show strike prices around the current price
+                    beginAtZero: false, // Show strike prices from 200 to 300
                 },
                 y: {
                     beginAtZero: true // Bars start from 0
