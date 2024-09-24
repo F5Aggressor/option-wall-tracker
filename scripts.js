@@ -32,21 +32,24 @@ async function getOptionsData() {
             return; // Stop further processing if no options data
         }
 
-        // Log the full structure of each option to investigate
-        optionsData.data.forEach((option, index) => {
-            console.log(`Option ${index}:`, option);
-        });
+        // Extracting CALL and PUT options
+        const firstOption = optionsData.data[0]; // We'll just take the first expiration date's options for now
+        const callOptions = firstOption.options.CALL;
+        const putOptions = firstOption.options.PUT;
 
-        // Try extracting strikes, calls, and puts (temporary adjustments)
-        const strikes = optionsData.data.map(option => option.strike);
-        const callsOI = optionsData.data.filter(option => option.type === 'CALL').map(option => option.openInterest);
-        const putsOI = optionsData.data.filter(option => option.type === 'PUT').map(option => option.openInterest);
+        console.log("Call Options:", callOptions);
+        console.log("Put Options:", putOptions);
+
+        // Extract strikes, calls open interest, and puts open interest
+        const strikes = callOptions.map(option => option.strike);
+        const callsOI = callOptions.map(option => option.openInterest);
+        const putsOI = putOptions.map(option => option.openInterest);
 
         console.log("Strikes:", strikes);
         console.log("Calls Open Interest:", callsOI);
         console.log("Puts Open Interest:", putsOI);
 
-        // Limit to a range around the current price (5 strikes above and below)
+        // Limit to 5 strikes above and 5 strikes below the current price
         const limitedStrikes = strikes.filter(strike => Math.abs(strike - currentPrice) <= 5);
         console.log("Limited Strikes:", limitedStrikes);
 
@@ -54,10 +57,10 @@ async function getOptionsData() {
         const middleIndex = Math.floor(limitedStrikes.length / 2);
         limitedStrikes.splice(middleIndex, 0, currentPrice); // Insert current price at the center
 
-        // Generate chart data
+        // Generate chart data (matching strikes length)
         const chartData = {
             strikes: limitedStrikes,
-            callsOI: callsOI.slice(0, limitedStrikes.length),
+            callsOI: callsOI.slice(0, limitedStrikes.length), // Match to strikes length
             putsOI: putsOI.slice(0, limitedStrikes.length)
         };
 
@@ -80,19 +83,19 @@ function renderChart(data, currentPrice) {
     currentChart = new Chart(ctx, {
         type: 'bar',
         data: {
-            labels: data.strikes,
+            labels: data.strikes, // Strike prices (including current price in the middle)
             datasets: [
                 {
                     label: 'Calls Open Interest',
                     data: data.callsOI,
-                    backgroundColor: 'rgba(75, 192, 192, 0.5)',
+                    backgroundColor: 'rgba(75, 192, 192, 0.5)', // Light blue for calls
                     borderColor: 'rgba(75, 192, 192, 1)',
                     borderWidth: 1
                 },
                 {
                     label: 'Puts Open Interest',
                     data: data.putsOI,
-                    backgroundColor: 'rgba(255, 99, 132, 0.5)',
+                    backgroundColor: 'rgba(255, 99, 132, 0.5)', // Light red for puts
                     borderColor: 'rgba(255, 99, 132, 1)',
                     borderWidth: 1
                 }
@@ -100,8 +103,11 @@ function renderChart(data, currentPrice) {
         },
         options: {
             scales: {
+                x: {
+                    beginAtZero: false, // Show strike prices around the current price
+                },
                 y: {
-                    beginAtZero: true
+                    beginAtZero: true // Bars start from 0
                 }
             },
             plugins: {
