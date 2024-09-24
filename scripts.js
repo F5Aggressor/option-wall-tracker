@@ -11,8 +11,10 @@ async function getOptionsData() {
 
     try {
         // Fetch stock price from Finnhub.io
+        console.log("Fetching stock price...");
         const priceResponse = await fetch(`https://finnhub.io/api/v1/quote?symbol=${ticker}&token=${apiKey}`);
         const priceData = await priceResponse.json();
+        console.log("Stock Price Response:", priceData);
         if (!priceData || !priceData.c) {
             throw new Error("Failed to retrieve stock price data.");
         }
@@ -20,8 +22,10 @@ async function getOptionsData() {
         console.log('Current Price:', currentPrice);
 
         // Fetch options chain from Finnhub.io
+        console.log("Fetching options chain...");
         const optionsResponse = await fetch(`https://finnhub.io/api/v1/stock/option-chain?symbol=${ticker}&token=${apiKey}`);
         const optionsData = await optionsResponse.json();
+        console.log("Options Chain Response:", optionsData);
 
         if (!optionsData || !optionsData.data || optionsData.data.length === 0) {
             throw new Error("Failed to retrieve options data.");
@@ -31,8 +35,13 @@ async function getOptionsData() {
         const callsOI = optionsData.data.filter(option => option.type === 'CALL').map(option => option.openInterest);
         const putsOI = optionsData.data.filter(option => option.type === 'PUT').map(option => option.openInterest);
 
+        console.log("Strikes:", strikes);
+        console.log("Calls Open Interest:", callsOI);
+        console.log("Puts Open Interest:", putsOI);
+
         // Limit to a range around the current price (5 strikes above and below)
         const limitedStrikes = strikes.filter(strike => Math.abs(strike - currentPrice) <= 5);
+        console.log("Limited Strikes:", limitedStrikes);
 
         // Generate chart data
         const chartData = {
