@@ -149,3 +149,26 @@ function renderChart(data, currentPrice) {
         }
     });
 }
+
+// Simple test to verify Chart.js is working
+document.addEventListener('DOMContentLoaded', (event) => {
+    const ctx = document.getElementById('optionsChart').getContext('2d');
+    const testChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['Test 1', 'Test 2', 'Test 3'],
+            datasets: [{
+                label: 'Test Data',
+                data: [10, 20, 30],
+                backgroundColor: 'rgba(75, 192, 192, 0.5)',
+                borderColor: 'rgba(75, 192, 192, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                y: { beginAtZero: true }
+            }
+        }
+    });
+});
