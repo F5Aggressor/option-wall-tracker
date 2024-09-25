@@ -1,12 +1,5 @@
 let currentChart = null; // Store the chart instance
 
-// Add event listener to execute when Enter key is pressed
-document.getElementById('stockTicker').addEventListener('keypress', function (e) {
-    if (e.key === 'Enter') {
-        getOptionsData(); // Execute the function when Enter is pressed
-    }
-});
-
 async function getOptionsData() {
     const ticker = document.getElementById('stockTicker').value;
     if (!ticker) {
@@ -21,50 +14,82 @@ async function getOptionsData() {
         console.log("Fetching stock price...");
         const priceResponse = await fetch(`https://finnhub.io/api/v1/quote?symbol=${ticker}&token=${apiKey}`);
         const priceData = await priceResponse.json();
+        console.log("Stock Price Response:", priceData);
         if (!priceData || !priceData.c) {
             throw new Error("Failed to retrieve stock price data.");
         }
         const currentPrice = priceData.c;
+        console.log('Current Price:', currentPrice);
 
         // Fetch options chain from Finnhub.io
         console.log("Fetching options chain...");
         const optionsResponse = await fetch(`https://finnhub.io/api/v1/stock/option-chain?symbol=${ticker}&token=${apiKey}`);
         const optionsData = await optionsResponse.json();
+        console.log("Options Chain Response:", optionsData);
 
         if (!optionsData || !optionsData.data || optionsData.data.length === 0) {
             alert("No options data available for this ticker.");
-            return; 
+            return; // Stop further processing if no options data
         }
 
-        // Extracting CALL and PUT options for the first expiration date
-        const firstOption = optionsData.data[0]; // First expiration date's options
-        const callOptions = firstOption.options.CALL;
-        const putOptions = firstOption.options.PUT;
+        // Initialize combined data structures for open interest
+        const combinedCallsOI = {};
+        const combinedPutsOI = {};
+        
+        const sixMonthsLater = new Date();
+        sixMonthsLater.setMonth(sixMonthsLater.getMonth() + 6);
+
+        // Loop through all expiration dates and combine open interest
+        optionsData.data.forEach(optionChain => {
+            const expirationDate = new Date(optionChain.expirationDate);
+
+            // Only consider options expiring within 6 months
+            if (expirationDate <= sixMonthsLater) {
+                const callOptions = optionChain.options.CALL;
+                const putOptions = optionChain.options.PUT;
+
+                callOptions.forEach(option => {
+                    const strike = option.strike;
+                    if (!combinedCallsOI[strike]) {
+                        combinedCallsOI[strike] = 0;
+                    }
+                    combinedCallsOI[strike] += option.openInterest; // Sum the open interest for calls
+                });
+
+                putOptions.forEach(option => {
+                    const strike = option.strike;
+                    if (!combinedPutsOI[strike]) {
+                        combinedPutsOI[strike] = 0;
+                    }
+                    combinedPutsOI[strike] += option.openInterest; // Sum the open interest for puts
+                });
+            }
+        });
 
         // Generate strikes 50 points below and above the current price
-        const minStrike = Math.max(0, Math.floor((currentPrice - 50) / 5) * 5); // Ensure strikes are not below 0
+        const minStrike = Math.floor((currentPrice - 50) / 5) * 5; // Ensure strikes are multiples of 5
         const maxStrike = Math.ceil((currentPrice + 50) / 5) * 5;
         const strikeRange = [];
 
-        for (let strike = minStrike; strike <= maxStrike; strike += 1) { // Increment strikes by 1 for clarity
-            strikeRange.push(strike);
+        for (let strike = minStrike; strike <= maxStrike; strike += 2.5) {
+            strikeRange.push(strike); // Push strikes in 2.5 increments
         }
 
-        // Map strikes with calls and puts open interest
-        const strikes = callOptions.map(option => option.strike);
-        const callsOI = callOptions.map(option => option.openInterest);
-        const putsOI = putOptions.map(option => option.openInterest);
+        console.log(`Strike Range (from ${minStrike} to ${maxStrike}):`, strikeRange);
 
-        // Initialize arrays for calls and puts open interest with 0 values
+        // Initialize arrays for strikes, calls open interest, and puts open interest
         const chartCallsOI = strikeRange.map(strike => {
-            const index = strikes.indexOf(strike);
-            return index !== -1 ? callsOI[index] : 0;
+            const index = strike;
+            return combinedCallsOI[index] || 0;
         });
 
         const chartPutsOI = strikeRange.map(strike => {
-            const index = strikes.indexOf(strike);
-            return index !== -1 ? putsOI[index] : 0;
+            const index = strike;
+            return combinedPutsOI[index] || 0;
         });
+
+        console.log("Chart Calls Open Interest:", chartCallsOI);
+        console.log("Chart Puts Open Interest:", chartPutsOI);
 
         // Generate chart data
         const chartData = {
@@ -88,42 +113,36 @@ function renderChart(data, currentPrice) {
         currentChart.destroy();
     }
 
-    // Find the closest strike price to the current price
-    const closestStrikeIndex = data.strikes.reduce((prevIndex, currentStrike, currentIndex) => {
-        return Math.abs(currentStrike - currentPrice) < Math.abs(data.strikes[prevIndex] - currentPrice)
-            ? currentIndex
-            : prevIndex;
-    }, 0);
-
-    // Create a new chart instance with a vertical line for the current stock price
+    // Create a new chart instance with thicker bars and combined data
     currentChart = new Chart(ctx, {
         type: 'bar',
         data: {
-            labels: data.strikes, // Strike prices with increments of 1
+            labels: data.strikes, // Strike prices dynamically filtered based on current price
             datasets: [
                 {
                     label: 'Calls Open Interest',
                     data: data.callsOI,
                     backgroundColor: 'rgba(75, 192, 192, 0.5)', // Light blue for calls
                     borderColor: 'rgba(75, 192, 192, 1)',
-                    borderWidth: 1
+                    borderWidth: 1,
+                    barThickness: 20, // Make bars thicker
                 },
                 {
                     label: 'Puts Open Interest',
                     data: data.putsOI,
                     backgroundColor: 'rgba(255, 99, 132, 0.5)', // Light red for puts
                     borderColor: 'rgba(255, 99, 132, 1)',
-                    borderWidth: 1
+                    borderWidth: 1,
+                    barThickness: 20, // Make bars thicker
                 }
             ]
         },
         options: {
             scales: {
                 x: {
-                    beginAtZero: true, // Ensure x-axis does not go negative
-                    ticks: {
-                        stepSize: 1, // Ensure x-axis increments by 1
-                    }
+                    beginAtZero: false, // Show strike prices based on dynamic range
+                    barPercentage: 1.0, // Adjust bar width relative to space (1.0 is full width)
+                    categoryPercentage: 0.8 // Adjust how bars fit within their category space
                 },
                 y: {
                     beginAtZero: true // Bars start from 0
@@ -132,25 +151,18 @@ function renderChart(data, currentPrice) {
             plugins: {
                 annotation: {
                     annotations: {
-                        currentPriceLine: {
+                        line1: {
                             type: 'line',
-                            xMin: closestStrikeIndex, // Align vertical line to the closest strike index
-                            xMax: closestStrikeIndex,
-                            borderColor: 'rgba(0, 0, 0, 0.7)',
+                            yMin: currentPrice,
+                            yMax: currentPrice,
+                            borderColor: 'rgba(0, 0, 0, 0.5)',
                             borderWidth: 2,
                             label: {
                                 enabled: true,
-                                content: `$${currentPrice}`, // Display only the price without "Current Price" text
-                                position: 'start',
+                                content: `Current Price: $${currentPrice}`,
+                                position: 'end',
                                 backgroundColor: 'rgba(0,0,0,0.7)',
                                 color: '#fff',
                                 padding: 6
                             }
-                        }
-                    }
-                }
-            }
-        }
-    });
-}
-
+                
