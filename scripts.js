@@ -81,7 +81,9 @@ function renderChart(data, currentPrice) {
                     backgroundColor: 'rgba(75, 192, 192, 0.7)', // Light blue for calls
                     borderColor: 'rgba(75, 192, 192, 1)',
                     borderWidth: 1,
-                    barThickness: 15, // Thicker bars
+                    // Reduce the bar thickness
+                    categoryPercentage: 0.5, // Reduce overall category width to prevent overlap
+                    barPercentage: 0.8 // Reduce individual bar width within the category
                 },
                 {
                     label: 'Puts Open Interest',
@@ -89,7 +91,9 @@ function renderChart(data, currentPrice) {
                     backgroundColor: 'rgba(255, 99, 132, 0.7)', // Light red for puts
                     borderColor: 'rgba(255, 99, 132, 1)',
                     borderWidth: 1,
-                    barThickness: 15, // Thicker bars
+                    // Reduce the bar thickness
+                    categoryPercentage: 0.5,
+                    barPercentage: 0.8
                 }
             ]
         },
@@ -107,17 +111,18 @@ function renderChart(data, currentPrice) {
                     annotations: {
                         currentPriceLine: {
                             type: 'line',
-                            xMin: currentPrice, // Set the vertical line at the current price
+                            xMin: currentPrice, // Show the line at the current price position
                             xMax: currentPrice,
                             borderColor: 'rgba(0, 0, 0, 0.8)', // Black line for current price
                             borderWidth: 2,
                             label: {
                                 enabled: true,
-                                content: `Current Price: $${currentPrice.toFixed(2)}`, // Label for the current price
+                                content: `Current Price: $${currentPrice.toFixed(2)}`, // Bubble with price
                                 backgroundColor: 'rgba(0,0,0,0.7)',
                                 color: '#fff',
-                                position: 'end', // Place the label on the end of the line
-                                xAdjust: -20, // Adjust the label position
+                                position: 'center', // Center the label over the line
+                                padding: 6,
+                                xAdjust: -40, // Adjust label placement on the line
                                 yAdjust: -20
                             }
                         }
