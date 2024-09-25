@@ -26,7 +26,7 @@ async function getOptionsData() {
             return;
         }
 
-        // Use the first expiration date (typically one week out)
+        // Only use the first expiration date (typically one week out)
         const firstOption = optionsData.data[0]; // First expiration date's options
         const callOptions = firstOption.options.CALL;
         const putOptions = firstOption.options.PUT;
@@ -107,18 +107,17 @@ function renderChart(data, currentPrice) {
                     annotations: {
                         currentPriceLine: {
                             type: 'line',
-                            xMin: currentPrice, // Show the line at the current price position
+                            xMin: currentPrice, // Set the vertical line at the current price
                             xMax: currentPrice,
                             borderColor: 'rgba(0, 0, 0, 0.8)', // Black line for current price
                             borderWidth: 2,
                             label: {
                                 enabled: true,
-                                content: `Current Price: $${currentPrice.toFixed(2)}`, // Bubble with price
+                                content: `Current Price: $${currentPrice.toFixed(2)}`, // Label for the current price
                                 backgroundColor: 'rgba(0,0,0,0.7)',
                                 color: '#fff',
-                                position: 'center', // Center the label over the line
-                                padding: 6,
-                                xAdjust: -40, // Adjust label placement on the line
+                                position: 'end', // Place the label on the end of the line
+                                xAdjust: -20, // Adjust the label position
                                 yAdjust: -20
                             }
                         }
