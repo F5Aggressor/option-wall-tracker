@@ -1,5 +1,12 @@
 let currentChart = null; // Store the chart instance
 
+// Add event listener to execute when Enter key is pressed
+document.getElementById('stockTicker').addEventListener('keypress', function (e) {
+    if (e.key === 'Enter') {
+        getOptionsData(); // Execute the function when Enter is pressed
+    }
+});
+
 async function getOptionsData() {
     const ticker = document.getElementById('stockTicker').value;
     if (!ticker) {
@@ -133,7 +140,7 @@ function renderChart(data, currentPrice) {
                             borderWidth: 2,
                             label: {
                                 enabled: true,
-                                content: `Current Price: $${currentPrice}`,
+                                content: `$${currentPrice}`, // Display only the price without "Current Price" text
                                 position: 'start',
                                 backgroundColor: 'rgba(0,0,0,0.7)',
                                 color: '#fff',
@@ -146,3 +153,4 @@ function renderChart(data, currentPrice) {
         }
     });
 }
+
