@@ -26,7 +26,7 @@ async function getOptionsData() {
             return;
         }
 
-        // Only use the first expiration date (typically one week out)
+        // Only use the first expiration date (one week out)
         const firstOption = optionsData.data[0]; // First expiration date's options
         const callOptions = firstOption.options.CALL;
         const putOptions = firstOption.options.PUT;
@@ -36,9 +36,11 @@ async function getOptionsData() {
         const callsOI = callOptions.map(option => option.openInterest);
         const putsOI = putOptions.map(option => option.openInterest);
 
-        // Filter strikes based on dynamic range (50 points above and below current price)
+        // Set a dynamic range of 50 points above and below the current price to center the chart
         const minStrike = currentPrice - 50;
         const maxStrike = currentPrice + 50;
+
+        // Filter strikes within this range
         const limitedStrikes = strikes.filter(strike => strike >= minStrike && strike <= maxStrike);
 
         // Ensure the calls and puts open interest are sliced to match the limited strikes
@@ -111,11 +113,13 @@ function renderChart(data, currentPrice) {
                             borderWidth: 2,
                             label: {
                                 enabled: true,
-                                content: `Current Price: $${currentPrice}`,
+                                content: `Current Price: $${currentPrice.toFixed(2)}`,
                                 backgroundColor: 'rgba(0,0,0,0.7)',
                                 color: '#fff',
-                                position: 'start',
-                                padding: 6
+                                position: 'center', // Show the label near the line
+                                padding: 6,
+                                xAdjust: -40, // Adjust label placement on the line
+                                yAdjust: -20
                             }
                         }
                     }
