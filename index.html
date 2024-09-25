@@ -4,11 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Option Wall Tracker</title>
-    
-    <!-- Load Chart.js and Chart.js Annotation Plugin -->
+    <!-- Load Chart.js and annotation plugin -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@1.0.0"></script>
-    
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@1.0.2"></script>
+    <!-- Optional: Link your CSS file here -->
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -19,11 +18,11 @@
             <button onclick="getOptionsData()">Submit</button>
         </div>
 
-        <!-- Place the canvas for the chart -->
-        <canvas id="optionsChart" width="1200" height="600"></canvas>
+        <!-- Canvas for the chart -->
+        <canvas id="optionsChart" width="1200" height="600"></canvas> <!-- Larger canvas for the chart -->
     </div>
 
-    <!-- Link to the external JS file -->
+    <!-- Link your JavaScript file -->
     <script src="scripts.js"></script>
 </body>
 </html>
