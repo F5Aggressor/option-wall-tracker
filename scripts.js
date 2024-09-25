@@ -32,40 +32,54 @@ async function getOptionsData() {
             return; // Stop further processing if no options data
         }
 
-        // Extracting CALL and PUT options for the first expiration date
-        const firstOption = optionsData.data[0]; // First expiration date's options
-        const callOptions = firstOption.options.CALL;
-        const putOptions = firstOption.options.PUT;
+        // Initialize combined data structures for open interest
+        const combinedCallsOI = {};
+        const combinedPutsOI = {};
+        
+        const sixMonthsLater = new Date();
+        sixMonthsLater.setMonth(sixMonthsLater.getMonth() + 6);
 
-        console.log("Call Options Full Data:", callOptions);
-        console.log("Put Options Full Data:", putOptions);
+        // Loop through all expiration dates and combine open interest
+        optionsData.data.forEach(optionChain => {
+            const expirationDate = new Date(optionChain.expirationDate);
 
-        // Extract strikes, calls open interest, and puts open interest
-        const strikes = callOptions.map(option => option.strike);
-        const callsOI = callOptions.map(option => option.openInterest);
-        const putsOI = putOptions.map(option => option.openInterest);
+            // Only consider options expiring within 6 months
+            if (expirationDate <= sixMonthsLater) {
+                const callOptions = optionChain.options.CALL;
+                const putOptions = optionChain.options.PUT;
 
-        console.log("Strikes Extracted:", strikes);
-        console.log("Calls Open Interest Extracted:", callsOI);
-        console.log("Puts Open Interest Extracted:", putsOI);
+                callOptions.forEach(option => {
+                    const strike = option.strike;
+                    if (!combinedCallsOI[strike]) {
+                        combinedCallsOI[strike] = 0;
+                    }
+                    combinedCallsOI[strike] += option.openInterest; // Sum the open interest for calls
+                });
 
-        // Filter strikes based on dynamic range (50 points above and below current price)
-        const minStrike = currentPrice - 50;
-        const maxStrike = currentPrice + 50;
-        const limitedStrikes = strikes.filter(strike => strike >= minStrike && strike <= maxStrike);
+                putOptions.forEach(option => {
+                    const strike = option.strike;
+                    if (!combinedPutsOI[strike]) {
+                        combinedPutsOI[strike] = 0;
+                    }
+                    combinedPutsOI[strike] += option.openInterest; // Sum the open interest for puts
+                });
+            }
+        });
 
-        // Ensure the calls and puts open interest is sliced to match the limited strikes
-        const limitedCallsOI = callsOI.slice(0, limitedStrikes.length);
-        const limitedPutsOI = putsOI.slice(0, limitedStrikes.length);
+        // Create arrays for strikes, calls open interest, and puts open interest
+        const strikes = Object.keys(combinedCallsOI).sort((a, b) => a - b).map(Number);
+        const callsOI = strikes.map(strike => combinedCallsOI[strike] || 0);
+        const putsOI = strikes.map(strike => combinedPutsOI[strike] || 0);
 
-        console.log("Limited Calls Open Interest after slicing:", limitedCallsOI);
-        console.log("Limited Puts Open Interest after slicing:", limitedPutsOI);
+        console.log("Aggregated Strikes:", strikes);
+        console.log("Aggregated Calls Open Interest:", callsOI);
+        console.log("Aggregated Puts Open Interest:", putsOI);
 
         // Generate chart data
         const chartData = {
-            strikes: limitedStrikes,
-            callsOI: limitedCallsOI,
-            putsOI: limitedPutsOI
+            strikes: strikes, // Use the combined strike prices
+            callsOI: callsOI, // Use the combined calls OI
+            putsOI: putsOI // Use the combined puts OI
         };
 
         renderChart(chartData, currentPrice);
@@ -83,7 +97,7 @@ function renderChart(data, currentPrice) {
         currentChart.destroy();
     }
 
-    // Create a new chart instance
+    // Create a new chart instance with the combined data
     currentChart = new Chart(ctx, {
         type: 'bar',
         data: {
@@ -92,18 +106,16 @@ function renderChart(data, currentPrice) {
                 {
                     label: 'Calls Open Interest',
                     data: data.callsOI,
-                    backgroundColor: 'rgba(75, 192, 192, 0.7)', // Light blue for calls
+                    backgroundColor: 'rgba(75, 192, 192, 0.5)', // Light blue for calls
                     borderColor: 'rgba(75, 192, 192, 1)',
-                    borderWidth: 1,
-                    barThickness: 15, // Thicker bars
+                    borderWidth: 1
                 },
                 {
                     label: 'Puts Open Interest',
                     data: data.putsOI,
-                    backgroundColor: 'rgba(255, 99, 132, 0.7)', // Light red for puts
+                    backgroundColor: 'rgba(255, 99, 132, 0.5)', // Light red for puts
                     borderColor: 'rgba(255, 99, 132, 1)',
-                    borderWidth: 1,
-                    barThickness: 15, // Thicker bars
+                    borderWidth: 1
                 }
             ]
         },
@@ -140,4 +152,5 @@ function renderChart(data, currentPrice) {
         }
     });
 }
+
 
