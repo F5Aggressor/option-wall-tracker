@@ -165,4 +165,10 @@ function renderChart(data, currentPrice) {
                                 color: '#fff',
                                 padding: 6
                             }
-                
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
