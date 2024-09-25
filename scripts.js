@@ -81,6 +81,13 @@ function renderChart(data, currentPrice) {
         currentChart.destroy();
     }
 
+    // Find the closest strike price to the current price
+    const closestStrikeIndex = data.strikes.reduce((prevIndex, currentStrike, currentIndex) => {
+        return Math.abs(currentStrike - currentPrice) < Math.abs(data.strikes[prevIndex] - currentPrice)
+            ? currentIndex
+            : prevIndex;
+    }, 0);
+
     // Create a new chart instance with a vertical line for the current stock price
     currentChart = new Chart(ctx, {
         type: 'bar',
@@ -120,14 +127,14 @@ function renderChart(data, currentPrice) {
                     annotations: {
                         currentPriceLine: {
                             type: 'line',
-                            xMin: data.strikes.indexOf(Math.round(currentPrice)), // Place vertical line at the closest strike price
-                            xMax: data.strikes.indexOf(Math.round(currentPrice)),
+                            xMin: closestStrikeIndex, // Align vertical line to the closest strike index
+                            xMax: closestStrikeIndex,
                             borderColor: 'rgba(0, 0, 0, 0.7)',
                             borderWidth: 2,
                             label: {
                                 enabled: true,
                                 content: `Current Price: $${currentPrice}`,
-                                position: 'end',
+                                position: 'start',
                                 backgroundColor: 'rgba(0,0,0,0.7)',
                                 color: '#fff',
                                 padding: 6
@@ -139,4 +146,3 @@ function renderChart(data, currentPrice) {
         }
     });
 }
-
