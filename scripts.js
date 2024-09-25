@@ -35,7 +35,7 @@ async function getOptionsData() {
         const putOptions = firstOption.options.PUT;
 
         // Generate strikes 50 points below and above the current price
-        const minStrike = Math.floor((currentPrice - 50) / 5) * 5; // Ensure strikes are multiples of 5
+        const minStrike = Math.max(0, Math.floor((currentPrice - 50) / 5) * 5); // Ensure strikes are not below 0
         const maxStrike = Math.ceil((currentPrice + 50) / 5) * 5;
         const strikeRange = [];
 
@@ -106,7 +106,7 @@ function renderChart(data, currentPrice) {
         options: {
             scales: {
                 x: {
-                    beginAtZero: false,
+                    beginAtZero: true, // Ensure x-axis does not go negative
                     ticks: {
                         stepSize: 1, // Ensure x-axis increments by 1
                     }
@@ -139,4 +139,3 @@ function renderChart(data, currentPrice) {
         }
     });
 }
-
