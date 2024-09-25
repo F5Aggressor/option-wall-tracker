@@ -39,8 +39,8 @@ async function getOptionsData() {
         const maxStrike = Math.ceil((currentPrice + 50) / 5) * 5;
         const strikeRange = [];
 
-        for (let strike = minStrike; strike <= maxStrike; strike += 2.5) {
-            strikeRange.push(strike); // Push strikes in 2.5 increments
+        for (let strike = minStrike; strike <= maxStrike; strike += 1) { // Increment strikes by 1 for clarity
+            strikeRange.push(strike);
         }
 
         // Map strikes with calls and puts open interest
@@ -81,11 +81,11 @@ function renderChart(data, currentPrice) {
         currentChart.destroy();
     }
 
-    // Create a new chart instance with a broader X-axis range
+    // Create a new chart instance with a vertical line for the current stock price
     currentChart = new Chart(ctx, {
         type: 'bar',
         data: {
-            labels: data.strikes, // Strike prices dynamically filtered based on current price
+            labels: data.strikes, // Strike prices with increments of 1
             datasets: [
                 {
                     label: 'Calls Open Interest',
@@ -106,7 +106,10 @@ function renderChart(data, currentPrice) {
         options: {
             scales: {
                 x: {
-                    beginAtZero: false, // Show strike prices based on dynamic range
+                    beginAtZero: false,
+                    ticks: {
+                        stepSize: 1, // Ensure x-axis increments by 1
+                    }
                 },
                 y: {
                     beginAtZero: true // Bars start from 0
@@ -115,11 +118,11 @@ function renderChart(data, currentPrice) {
             plugins: {
                 annotation: {
                     annotations: {
-                        line1: {
+                        currentPriceLine: {
                             type: 'line',
-                            yMin: currentPrice,
-                            yMax: currentPrice,
-                            borderColor: 'rgba(0, 0, 0, 0.5)',
+                            xMin: currentPrice,
+                            xMax: currentPrice,
+                            borderColor: 'rgba(0, 0, 0, 0.7)',
                             borderWidth: 2,
                             label: {
                                 enabled: true,
@@ -136,3 +139,4 @@ function renderChart(data, currentPrice) {
         }
     });
 }
+
