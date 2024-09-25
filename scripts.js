@@ -11,55 +11,39 @@ async function getOptionsData() {
 
     try {
         // Fetch stock price from Finnhub.io
-        console.log("Fetching stock price...");
         const priceResponse = await fetch(`https://finnhub.io/api/v1/quote?symbol=${ticker}&token=${apiKey}`);
         const priceData = await priceResponse.json();
-        console.log("Stock Price Response:", priceData);
         if (!priceData || !priceData.c) {
             throw new Error("Failed to retrieve stock price data.");
         }
         const currentPrice = priceData.c;
-        console.log('Current Price:', currentPrice);
 
-        // Fetch options chain from Finnhub.io
-        console.log("Fetching options chain...");
+        // Fetch options chain from Finnhub.io for the nearest expiration date (one week out)
         const optionsResponse = await fetch(`https://finnhub.io/api/v1/stock/option-chain?symbol=${ticker}&token=${apiKey}`);
         const optionsData = await optionsResponse.json();
-        console.log("Options Chain Response:", optionsData);
-
         if (!optionsData || !optionsData.data || optionsData.data.length === 0) {
             alert("No options data available for this ticker.");
-            return; // Stop further processing if no options data
+            return;
         }
 
-        // Extracting CALL and PUT options for the first expiration date
+        // Only use the first expiration date (typically one week out)
         const firstOption = optionsData.data[0]; // First expiration date's options
         const callOptions = firstOption.options.CALL;
         const putOptions = firstOption.options.PUT;
-
-        console.log("Call Options Full Data:", callOptions);
-        console.log("Put Options Full Data:", putOptions);
 
         // Extract strikes, calls open interest, and puts open interest
         const strikes = callOptions.map(option => option.strike);
         const callsOI = callOptions.map(option => option.openInterest);
         const putsOI = putOptions.map(option => option.openInterest);
 
-        console.log("Strikes Extracted:", strikes);
-        console.log("Calls Open Interest Extracted:", callsOI);
-        console.log("Puts Open Interest Extracted:", putsOI);
-
         // Filter strikes based on dynamic range (50 points above and below current price)
         const minStrike = currentPrice - 50;
         const maxStrike = currentPrice + 50;
         const limitedStrikes = strikes.filter(strike => strike >= minStrike && strike <= maxStrike);
 
-        // Ensure the calls and puts open interest is sliced to match the limited strikes
+        // Ensure the calls and puts open interest are sliced to match the limited strikes
         const limitedCallsOI = callsOI.slice(0, limitedStrikes.length);
         const limitedPutsOI = putsOI.slice(0, limitedStrikes.length);
-
-        console.log("Limited Calls Open Interest after slicing:", limitedCallsOI);
-        console.log("Limited Puts Open Interest after slicing:", limitedPutsOI);
 
         // Generate chart data
         const chartData = {
@@ -83,7 +67,7 @@ function renderChart(data, currentPrice) {
         currentChart.destroy();
     }
 
-    // Create a new chart instance
+    // Create a new chart instance with proper annotation for the current price
     currentChart = new Chart(ctx, {
         type: 'bar',
         data: {
@@ -140,6 +124,3 @@ function renderChart(data, currentPrice) {
         }
     });
 }
-
-
-
