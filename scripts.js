@@ -120,8 +120,8 @@ function renderChart(data, currentPrice) {
                     annotations: {
                         currentPriceLine: {
                             type: 'line',
-                            xMin: currentPrice,
-                            xMax: currentPrice,
+                            xMin: data.strikes.indexOf(Math.round(currentPrice)), // Place vertical line at the closest strike price
+                            xMax: data.strikes.indexOf(Math.round(currentPrice)),
                             borderColor: 'rgba(0, 0, 0, 0.7)',
                             borderWidth: 2,
                             label: {
@@ -139,3 +139,4 @@ function renderChart(data, currentPrice) {
         }
     });
 }
+
