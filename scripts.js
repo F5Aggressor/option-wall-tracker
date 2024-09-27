@@ -46,10 +46,10 @@ async function getOptionsData() {
         const putsOI = putOptions.map(option => option.openInterest);
 
         // Get the min and max strike prices dynamically, limit to a range around current price
-        const minStrike = Math.max(Math.floor(currentPrice - 50), Math.min(...strikes));
-        const maxStrike = Math.min(Math.ceil(currentPrice + 50), Math.max(...strikes));
+        const minStrike = Math.max(Math.floor(currentPrice - 25), Math.min(...strikes));
+        const maxStrike = Math.min(Math.ceil(currentPrice + 25), Math.max(...strikes));
 
-        // Filter strikes within a 50-point range around the current price
+        // Filter strikes within a 25-point range around the current price
         const limitedStrikes = strikes.filter(strike => strike >= minStrike && strike <= maxStrike);
 
         // Ensure calls and puts open interest arrays match the limited strikes
@@ -88,11 +88,16 @@ function renderChart(data, currentPrice) {
         currentChart.destroy();
     }
 
+    // Find the closest strike price to the current price
+    const closestStrike = data.strikes.reduce((prev, curr) => {
+        return Math.abs(curr - currentPrice) < Math.abs(prev - currentPrice) ? curr : prev;
+    });
+
     // Create a new chart instance with proper annotation for the current price
     currentChart = new Chart(ctx, {
         type: 'bar',
         data: {
-            labels: data.strikes, // Filtered strike prices within a limited range
+            labels: data.strikes, // Dynamic strike prices (filtered range)
             datasets: [
                 {
                     label: 'Calls Open Interest',
@@ -119,8 +124,8 @@ function renderChart(data, currentPrice) {
                 x: {
                     beginAtZero: false, // Show strike prices dynamically
                     ticks: {
-                        autoSkip: true, // Auto-skip some labels to prevent overlap
-                        maxRotation: 45, // Rotate the labels for better fit
+                        autoSkip: true, // Auto-skip labels for clarity
+                        maxRotation: 45,
                         minRotation: 45
                     }
                 },
@@ -134,7 +139,7 @@ function renderChart(data, currentPrice) {
                         currentPriceLine: {
                             type: 'line',
                             scaleID: 'x',
-                            value: currentPrice, // Align the line to the exact current price
+                            value: closestStrike, // Place the line at the closest strike price
                             borderColor: 'rgba(0, 0, 0, 0.8)', // Black line for current price
                             borderWidth: 2,
                             label: {
@@ -142,10 +147,10 @@ function renderChart(data, currentPrice) {
                                 content: `Current Price: $${currentPrice.toFixed(2)}`, // Bubble with price
                                 backgroundColor: 'rgba(0,0,0,0.7)',
                                 color: '#fff',
-                                position: 'end', // Position the label at the bottom of the chart
+                                position: 'end',
                                 padding: 6,
-                                xAdjust: 0, // Place the label right on the line
-                                yAdjust: 20 // Adjust placement so it's below the chart area
+                                xAdjust: 0,
+                                yAdjust: 20
                             }
                         }
                     }
