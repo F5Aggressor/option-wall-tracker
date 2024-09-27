@@ -47,6 +47,11 @@ async function getOptionsData() {
         const limitedCallsOI = callsOI.slice(0, limitedStrikes.length);
         const limitedPutsOI = putsOI.slice(0, limitedStrikes.length);
 
+        if (limitedStrikes.length === 0) {
+            alert("No strikes found within the selected range.");
+            return;
+        }
+
         // Generate chart data
         const chartData = {
             strikes: limitedStrikes,
@@ -81,7 +86,6 @@ function renderChart(data, currentPrice) {
                     backgroundColor: 'rgba(75, 192, 192, 0.7)', // Light blue for calls
                     borderColor: 'rgba(75, 192, 192, 1)',
                     borderWidth: 1,
-                    // Reduce the bar thickness
                     categoryPercentage: 0.5, // Reduce overall category width to prevent overlap
                     barPercentage: 0.8 // Reduce individual bar width within the category
                 },
@@ -91,7 +95,6 @@ function renderChart(data, currentPrice) {
                     backgroundColor: 'rgba(255, 99, 132, 0.7)', // Light red for puts
                     borderColor: 'rgba(255, 99, 132, 1)',
                     borderWidth: 1,
-                    // Reduce the bar thickness
                     categoryPercentage: 0.5,
                     barPercentage: 0.8
                 }
