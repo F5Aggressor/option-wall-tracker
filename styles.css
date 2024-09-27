@@ -16,7 +16,7 @@ body {
     border-radius: 8px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     width: 90%;
-    max-width: 600px;
+    max-width: 1200px; /* Increased the container width */
 }
 
 h1 {
@@ -49,5 +49,5 @@ button:hover {
 canvas {
     margin-top: 30px;
     width: 100% !important;
-    height: 300px !important;
+    height: 600px !important; /* Increased height of the canvas */
 }
