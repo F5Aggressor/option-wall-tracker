@@ -10,16 +10,32 @@ async function getOptionsData() {
     const apiKey = 'crpflppr01qsek0flv0gcrpflppr01qsek0flv10'; // Your Finnhub API key
 
     try {
-        // Fetch stock price from Finnhub.io
-        const priceResponse = await fetch(`https://finnhub.io/api/v1/quote?symbol=${ticker}&token=${apiKey}`);
+        // Clear previous chart instance
+        if (currentChart) {
+            currentChart.destroy();
+        }
+
+        // Fetch stock price from Finnhub.io with no-cache
+        const priceResponse = await fetch(`https://finnhub.io/api/v1/quote?symbol=${ticker}&token=${apiKey}`, {
+            method: 'GET',
+            headers: {
+                'Cache-Control': 'no-cache'
+            }
+        });
         const priceData = await priceResponse.json();
         if (!priceData || !priceData.c) {
             throw new Error("Failed to retrieve stock price data.");
         }
         const currentPrice = priceData.c;
 
-        // Fetch options chain from Finnhub.io for the nearest expiration date (this week)
-        const optionsResponse = await fetch(`https://finnhub.io/api/v1/stock/option-chain?symbol=${ticker}&token=${apiKey}`);
+        // Add a timestamp to the URL to prevent caching for options chain
+        const timestamp = new Date().getTime();
+        const optionsResponse = await fetch(`https://finnhub.io/api/v1/stock/option-chain?symbol=${ticker}&token=${apiKey}&_=${timestamp}`, {
+            method: 'GET',
+            headers: {
+                'Cache-Control': 'no-cache'
+            }
+        });
         const optionsData = await optionsResponse.json();
         if (!optionsData || !optionsData.data || optionsData.data.length === 0) {
             alert("No options data available for this ticker.");
@@ -29,9 +45,9 @@ async function getOptionsData() {
         // Get today's date
         const today = new Date();
         const todayDayOfWeek = today.getDay();
-        const daysUntilSaturday = 6 - todayDayOfWeek; // Calculate how many days until Saturday
+        const daysUntilSaturday = 6 - todayDayOfWeek; // Calculate how many days until Saturday (considered end of the week)
 
-        // Get the nearest expiration date that falls within this week
+        // Get the nearest expiration date that falls within this week (i.e., by the coming Saturday)
         const thisWeekOptions = optionsData.data.find(option => {
             const expirationDate = new Date(option.expirationDate);
             const timeDiff = expirationDate - today;
@@ -76,6 +92,10 @@ async function getOptionsData() {
         };
 
         renderChart(chartData, currentPrice);
+
+        // Clear the stock ticker input after fetching data
+        document.getElementById('stockTicker').value = '';
+
     } catch (error) {
         console.error('Error fetching data from Finnhub.io:', error);
         alert(`Error: ${error.message}`);
@@ -90,7 +110,7 @@ function renderChart(data, currentPrice) {
         currentChart.destroy();
     }
 
-    // Create a new chart instance with a vertical line for the current price and a bubble with the price at the bottom
+    // Create a new chart instance with proper annotation for the current price
     currentChart = new Chart(ctx, {
         type: 'bar',
         data: {
