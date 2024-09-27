@@ -15,27 +15,16 @@ async function getOptionsData() {
             currentChart.destroy();
         }
 
-        // Fetch stock price from Finnhub.io with no-cache
-        const priceResponse = await fetch(`https://finnhub.io/api/v1/quote?symbol=${ticker}&token=${apiKey}`, {
-            method: 'GET',
-            headers: {
-                'Cache-Control': 'no-cache'
-            }
-        });
+        // Fetch stock price from Finnhub.io
+        const priceResponse = await fetch(`https://finnhub.io/api/v1/quote?symbol=${ticker}&token=${apiKey}`);
         const priceData = await priceResponse.json();
         if (!priceData || !priceData.c) {
             throw new Error("Failed to retrieve stock price data.");
         }
         const currentPrice = priceData.c;
 
-        // Add a timestamp to the URL to prevent caching for options chain
-        const timestamp = new Date().getTime();
-        const optionsResponse = await fetch(`https://finnhub.io/api/v1/stock/option-chain?symbol=${ticker}&token=${apiKey}&_=${timestamp}`, {
-            method: 'GET',
-            headers: {
-                'Cache-Control': 'no-cache'
-            }
-        });
+        // Fetch options chain from Finnhub.io
+        const optionsResponse = await fetch(`https://finnhub.io/api/v1/stock/option-chain?symbol=${ticker}&token=${apiKey}`);
         const optionsData = await optionsResponse.json();
         if (!optionsData || !optionsData.data || optionsData.data.length === 0) {
             alert("No options data available for this ticker.");
@@ -143,34 +132,6 @@ function renderChart(data, currentPrice) {
                 },
                 y: {
                     beginAtZero: true // Bars start from 0
-                }
-            },
-            plugins: {
-                annotation: {
-                    annotations: {
-                        currentPriceLine: {
-                            type: 'line',
-                            scaleID: 'x',
-                            value: currentPrice, // Align the line to the exact current price
-                            borderColor: 'rgba(0, 0, 0, 0.8)', // Black line for current price
-                            borderWidth: 2,
-                            label: {
-                                enabled: true,
-                                content: `Current Price: $${currentPrice.toFixed(2)}`, // Bubble with price
-                                backgroundColor: 'rgba(0,0,0,0.7)',
-                                color: '#fff',
-                                position: 'end', // Position the label at the bottom of the chart
-                                padding: 6,
-                                xAdjust: 0, // Place the label right on the line
-                                yAdjust: 20 // Adjust placement so it's below the chart area
-                            }
-                        }
-                    }
-                }
-            },
-            layout: {
-                padding: {
-                    right: 50 // Extra space for the vertical line
                 }
             }
         }
