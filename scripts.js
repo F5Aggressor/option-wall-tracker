@@ -23,12 +23,13 @@ async function getOptionsData() {
             throw new Error("Failed to fetch stock price data");
         }
 
-        const priceData = await priceResponse.json();  // Make sure priceData is correctly defined
-        console.log('Price Data for ticker', ticker, ':', priceData);
+        // Parse the response and check for valid price data
+        const priceData = await priceResponse.json();
+        console.log('Price Data for ticker', ticker, ':', priceData);  // Debugging log
 
         // Validate if the price data contains the current price
-        if (!priceData || !priceData.c) {
-            throw new Error("Failed to retrieve stock price from the API.");
+        if (!priceData || typeof priceData.c === 'undefined') {
+            throw new Error(`Failed to retrieve current price for ${ticker}`);
         }
 
         const currentPrice = priceData.c;  // Extract current price
@@ -185,5 +186,4 @@ function renderChart(data, currentPrice) {
 const canvas = document.getElementById('optionsChart');
 canvas.width = 1000; // Adjust as needed for larger size
 canvas.height = 500; // Adjust height as needed
-
 
