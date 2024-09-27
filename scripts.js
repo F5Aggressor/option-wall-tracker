@@ -37,10 +37,10 @@ async function getOptionsData() {
         const callOptions = firstOption.options.CALL;
         const putOptions = firstOption.options.PUT;
 
-        // Extract strikes, calls, and puts open interest
+        // Extract strikes, calls, and puts open interest, replace undefined/zero values with 0
         const strikes = callOptions.map(option => option.strike);
-        const callsOI = callOptions.map(option => option.openInterest);
-        const putsOI = putOptions.map(option => option.openInterest);
+        const callsOI = callOptions.map(option => option.openInterest || 0); // Fallback to 0 if undefined
+        const putsOI = putOptions.map(option => option.openInterest || 0); // Fallback to 0 if undefined
 
         console.log('Strikes:', strikes);
         console.log('Calls OI:', callsOI);
@@ -124,5 +124,6 @@ function renderChart(data, currentPrice) {
         }
     });
 }
+
 
 
