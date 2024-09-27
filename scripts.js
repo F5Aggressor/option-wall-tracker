@@ -47,7 +47,7 @@ async function getOptionsData() {
         const todayDayOfWeek = today.getDay();
         const daysUntilSaturday = 6 - todayDayOfWeek; // Calculate how many days until Saturday (considered end of the week)
 
-        // Get the nearest expiration date that falls within this week (i.e., by the coming Saturday)
+        // Get the nearest expiration date that falls within this week
         const thisWeekOptions = optionsData.data.find(option => {
             const expirationDate = new Date(option.expirationDate);
             const timeDiff = expirationDate - today;
@@ -150,8 +150,8 @@ function renderChart(data, currentPrice) {
                     annotations: {
                         currentPriceLine: {
                             type: 'line',
-                            xMin: currentPrice, // Show the line at the current price position
-                            xMax: currentPrice,
+                            scaleID: 'x',
+                            value: currentPrice, // Align the line to the exact current price
                             borderColor: 'rgba(0, 0, 0, 0.8)', // Black line for current price
                             borderWidth: 2,
                             label: {
