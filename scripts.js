@@ -45,31 +45,28 @@ async function getOptionsData() {
         const callsOI = callOptions.map(option => option.openInterest);
         const putsOI = putOptions.map(option => option.openInterest);
 
-        // Get the min and max strike prices dynamically
-        const minStrike = Math.min(...strikes);
-        const maxStrike = Math.max(...strikes);
+        // Get the min and max strike prices dynamically, limit to a range around current price
+        const minStrike = Math.max(Math.floor(currentPrice - 50), Math.min(...strikes));
+        const maxStrike = Math.min(Math.ceil(currentPrice + 50), Math.max(...strikes));
 
-        // Ensure all strikes between the min and max values are displayed
-        const allStrikes = [];
-        for (let strike = Math.floor(minStrike); strike <= Math.ceil(maxStrike); strike++) {
-            allStrikes.push(strike);
-        }
+        // Filter strikes within a 50-point range around the current price
+        const limitedStrikes = strikes.filter(strike => strike >= minStrike && strike <= maxStrike);
 
-        // Ensure calls and puts open interest arrays match the allStrikes array
-        const callsOIFilled = allStrikes.map(strike => {
+        // Ensure calls and puts open interest arrays match the limited strikes
+        const limitedCallsOI = limitedStrikes.map(strike => {
             const index = strikes.indexOf(strike);
             return index > -1 ? callsOI[index] : 0;
         });
-        const putsOIFilled = allStrikes.map(strike => {
+        const limitedPutsOI = limitedStrikes.map(strike => {
             const index = strikes.indexOf(strike);
             return index > -1 ? putsOI[index] : 0;
         });
 
         // Generate chart data
         const chartData = {
-            strikes: allStrikes,
-            callsOI: callsOIFilled,
-            putsOI: putsOIFilled
+            strikes: limitedStrikes,
+            callsOI: limitedCallsOI,
+            putsOI: limitedPutsOI
         };
 
         renderChart(chartData, currentPrice);
@@ -95,7 +92,7 @@ function renderChart(data, currentPrice) {
     currentChart = new Chart(ctx, {
         type: 'bar',
         data: {
-            labels: data.strikes, // Dynamic strike prices (with $1 increments)
+            labels: data.strikes, // Filtered strike prices within a limited range
             datasets: [
                 {
                     label: 'Calls Open Interest',
@@ -122,7 +119,7 @@ function renderChart(data, currentPrice) {
                 x: {
                     beginAtZero: false, // Show strike prices dynamically
                     ticks: {
-                        autoSkip: false, // Ensure all $1 increments are shown
+                        autoSkip: true, // Auto-skip some labels to prevent overlap
                         maxRotation: 45, // Rotate the labels for better fit
                         minRotation: 45
                     }
