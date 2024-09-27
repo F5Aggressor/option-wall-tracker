@@ -76,6 +76,11 @@ async function getOptionsData() {
             return index > -1 ? putsOI[index] : 0;
         });
 
+        // Log the limited strikes and corresponding open interest
+        console.log('Filtered Strikes:', limitedStrikes);
+        console.log('Filtered Calls OI:', limitedCallsOI);
+        console.log('Filtered Puts OI:', limitedPutsOI);
+
         const chartData = {
             strikes: limitedStrikes,
             callsOI: limitedCallsOI,
