@@ -1,38 +1,39 @@
-let currentChart = null; // To store the chart instance
+let currentChart = null; // Store the chart instance
 
 async function getOptionsData() {
     const ticker = document.getElementById('stockTicker').value;
     if (!ticker) {
-        alert('Please enter a stock ticker!');
+        alert('Please enter a stock ticker symbol!');
         return;
     }
 
-    const apiKey = 'crpflppr01qsek0flv0gcrpflppr01qsek0flv10'; // Your Finnhub API Key
+    const apiKey = 'crpflppr01qsek0flv0gcrpflppr01qsek0flv10'; // Your Finnhub API key
 
     try {
-        // Clear previous chart
+        // Clear previous chart instance
         if (currentChart) {
             currentChart.destroy();
         }
 
-        // Fetch stock price from Finnhub
+        // Fetch stock price from Finnhub.io
         const priceResponse = await fetch(`https://finnhub.io/api/v1/quote?symbol=${ticker}&token=${apiKey}`);
         const priceData = await priceResponse.json();
-        
+
         if (!priceData || typeof priceData.c === 'undefined') {
-            throw new Error("Failed to retrieve stock price.");
+            throw new Error(`Failed to retrieve current price for ${ticker}`);
         }
+
         const currentPrice = priceData.c;
 
-        // Fetch options chain from Finnhub
+        // Fetch options chain from Finnhub.io
         const optionsResponse = await fetch(`https://finnhub.io/api/v1/stock/option-chain?symbol=${ticker}&token=${apiKey}`);
         const optionsData = await optionsResponse.json();
-        
+
         if (!optionsData || !optionsData.data || optionsData.data.length === 0) {
             throw new Error("No options data available.");
         }
 
-        const firstOption = optionsData.data[0]; // Get the first expiration date
+        const firstOption = optionsData.data[0]; // First expiration date
         const callOptions = firstOption.options.CALL;
         const putOptions = firstOption.options.PUT;
 
@@ -41,7 +42,11 @@ async function getOptionsData() {
         const callsOI = callOptions.map(option => option.openInterest);
         const putsOI = putOptions.map(option => option.openInterest);
 
-        // Render the chart with the fetched data
+        console.log('Strikes:', strikes);
+        console.log('Calls OI:', callsOI);
+        console.log('Puts OI:', putsOI);
+
+        // Prepare the chart data
         renderChart({ strikes, callsOI, putsOI }, currentPrice);
 
     } catch (error) {
@@ -53,6 +58,11 @@ async function getOptionsData() {
 function renderChart(data, currentPrice) {
     const ctx = document.getElementById('optionsChart').getContext('2d');
 
+    if (currentChart) {
+        currentChart.destroy();
+    }
+
+    // Create the chart
     currentChart = new Chart(ctx, {
         type: 'bar',
         data: {
@@ -97,7 +107,7 @@ function renderChart(data, currentPrice) {
                         line1: {
                             type: 'line',
                             scaleID: 'x',
-                            value: currentPrice,
+                            value: currentPrice,  // Position the line at the current price
                             borderColor: 'black',
                             borderWidth: 2,
                             label: {
