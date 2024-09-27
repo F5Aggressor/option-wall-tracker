@@ -40,27 +40,31 @@ async function getOptionsData() {
         const callsOI = callOptions.map(option => option.openInterest);
         const putsOI = putOptions.map(option => option.openInterest);
 
-        // Set a dynamic range of 50 points above and below the current price to center the chart
-        const minStrike = Math.max(currentPrice - 50, Math.min(...strikes));
-        const maxStrike = Math.min(currentPrice + 50, Math.max(...strikes));
+        // Get the min and max strike prices dynamically
+        const minStrike = Math.min(...strikes);
+        const maxStrike = Math.max(...strikes);
 
-        // Filter strikes within this range
-        const limitedStrikes = strikes.filter(strike => strike >= minStrike && strike <= maxStrike);
-
-        // Ensure the calls and puts open interest are sliced to match the limited strikes
-        const limitedCallsOI = callsOI.slice(0, limitedStrikes.length);
-        const limitedPutsOI = putsOI.slice(0, limitedStrikes.length);
-
-        if (limitedStrikes.length === 0) {
-            alert("No strikes found within the selected range.");
-            return;
+        // Ensure all strikes between the min and max values are displayed
+        const allStrikes = [];
+        for (let strike = Math.floor(minStrike); strike <= Math.ceil(maxStrike); strike++) {
+            allStrikes.push(strike);
         }
+
+        // Ensure calls and puts open interest arrays match the allStrikes array
+        const callsOIFilled = allStrikes.map(strike => {
+            const index = strikes.indexOf(strike);
+            return index > -1 ? callsOI[index] : 0;
+        });
+        const putsOIFilled = allStrikes.map(strike => {
+            const index = strikes.indexOf(strike);
+            return index > -1 ? putsOI[index] : 0;
+        });
 
         // Generate chart data
         const chartData = {
-            strikes: limitedStrikes,
-            callsOI: limitedCallsOI,
-            putsOI: limitedPutsOI
+            strikes: allStrikes,
+            callsOI: callsOIFilled,
+            putsOI: putsOIFilled
         };
 
         renderChart(chartData, currentPrice);
@@ -86,7 +90,7 @@ function renderChart(data, currentPrice) {
     currentChart = new Chart(ctx, {
         type: 'bar',
         data: {
-            labels: data.strikes, // Strike prices dynamically filtered based on current price
+            labels: data.strikes, // Dynamic strike prices (with $1 increments)
             datasets: [
                 {
                     label: 'Calls Open Interest',
@@ -111,7 +115,12 @@ function renderChart(data, currentPrice) {
         options: {
             scales: {
                 x: {
-                    beginAtZero: false, // Show strike prices based on dynamic range
+                    beginAtZero: false, // Show strike prices dynamically
+                    ticks: {
+                        autoSkip: false, // Ensure all $1 increments are shown
+                        maxRotation: 45, // Rotate the labels for better fit
+                        minRotation: 45
+                    }
                 },
                 y: {
                     beginAtZero: true // Bars start from 0
@@ -151,5 +160,5 @@ function renderChart(data, currentPrice) {
 
 // Increase canvas size to accommodate more data on the X-axis
 const canvas = document.getElementById('optionsChart');
-canvas.width = 800; // Adjust as needed for larger size
-canvas.height = 400; // Adjust height as needed
+canvas.width = 1000; // Adjust as needed for larger size
+canvas.height = 500; // Adjust height as needed
