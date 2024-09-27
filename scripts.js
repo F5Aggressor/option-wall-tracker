@@ -18,7 +18,7 @@ async function getOptionsData() {
         }
         const currentPrice = priceData.c;
 
-        // Fetch options chain from Finnhub.io for the nearest expiration date (one week out)
+        // Fetch options chain from Finnhub.io for the nearest expiration date (this week)
         const optionsResponse = await fetch(`https://finnhub.io/api/v1/stock/option-chain?symbol=${ticker}&token=${apiKey}`);
         const optionsData = await optionsResponse.json();
         if (!optionsData || !optionsData.data || optionsData.data.length === 0) {
@@ -26,10 +26,26 @@ async function getOptionsData() {
             return;
         }
 
-        // Only use the first expiration date (typically one week out)
-        const firstOption = optionsData.data[0]; // First expiration date's options
-        const callOptions = firstOption.options.CALL;
-        const putOptions = firstOption.options.PUT;
+        // Get today's date
+        const today = new Date();
+        const todayDayOfWeek = today.getDay();
+        const daysUntilSaturday = 6 - todayDayOfWeek; // Calculate how many days until Saturday
+
+        // Get the nearest expiration date that falls within this week
+        const thisWeekOptions = optionsData.data.find(option => {
+            const expirationDate = new Date(option.expirationDate);
+            const timeDiff = expirationDate - today;
+            const daysDiff = timeDiff / (1000 * 3600 * 24); // Convert milliseconds to days
+            return daysDiff <= daysUntilSaturday; // Include options expiring this week
+        });
+
+        if (!thisWeekOptions) {
+            alert("No options expiring this week.");
+            return;
+        }
+
+        const callOptions = thisWeekOptions.options.CALL;
+        const putOptions = thisWeekOptions.options.PUT;
 
         // Extract strikes, calls open interest, and puts open interest
         const strikes = callOptions.map(option => option.strike);
@@ -74,7 +90,7 @@ function renderChart(data, currentPrice) {
         currentChart.destroy();
     }
 
-    // Create a new chart instance with proper annotation for the current price
+    // Create a new chart instance with a vertical line for the current price and a bubble with the price at the bottom
     currentChart = new Chart(ctx, {
         type: 'bar',
         data: {
@@ -123,15 +139,25 @@ function renderChart(data, currentPrice) {
                                 content: `Current Price: $${currentPrice.toFixed(2)}`, // Bubble with price
                                 backgroundColor: 'rgba(0,0,0,0.7)',
                                 color: '#fff',
-                                position: 'center', // Center the label over the line
+                                position: 'end', // Position the label at the bottom of the chart
                                 padding: 6,
-                                xAdjust: -40, // Adjust label placement on the line
-                                yAdjust: -20
+                                xAdjust: 0, // Place the label right on the line
+                                yAdjust: 20 // Adjust placement so it's below the chart area
                             }
                         }
                     }
+                }
+            },
+            layout: {
+                padding: {
+                    right: 50 // Extra space for the vertical line
                 }
             }
         }
     });
 }
+
+// Increase canvas size to accommodate more data on the X-axis
+const canvas = document.getElementById('optionsChart');
+canvas.width = 800; // Adjust as needed for larger size
+canvas.height = 400; // Adjust height as needed
