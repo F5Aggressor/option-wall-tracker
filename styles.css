@@ -15,17 +15,18 @@ body {
     padding: 20px;
     border-radius: 8px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    width: 90%;
-    max-width: 1200px; /* Increased the container width */
+    width: 100%; /* Make container take full width */
+    max-width: 1400px; /* Adjust the maximum width of the container */
+    margin: auto;
 }
 
-h1 {
+.input-section {
     margin-bottom: 20px;
 }
 
 input[type="text"] {
     padding: 10px;
-    width: 80%;
+    width: 60%; /* Adjust the input width */
     margin-right: 10px;
     font-size: 16px;
     border: 1px solid #ccc;
@@ -46,8 +47,16 @@ button:hover {
     background-color: #0056b3;
 }
 
-canvas {
-    margin-top: 30px;
-    width: 100% !important;
-    height: 600px !important; /* Increased height of the canvas */
+.canvas-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
+
+canvas {
+    max-width: 100%; /* Make the canvas responsive */
+    max-height: 80vh; /* Ensure the chart doesn't overflow vertically */
+    height: auto;
+    width: auto;
+}
+
