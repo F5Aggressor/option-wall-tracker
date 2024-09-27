@@ -39,7 +39,7 @@ async function getOptionsData() {
         }
 
         const optionsData = await optionsResponse.json();
-        console.log('Parsed Options Data for ticker', ticker, ':', optionsData);
+        console.log('Parsed Options Data for ticker', ticker, ':', optionsData);  // Debugging log
 
         if (!optionsData || !optionsData.data || optionsData.data.length === 0) {
             alert("No options data available for this ticker.");
@@ -56,12 +56,14 @@ async function getOptionsData() {
         const putsOI = putOptions.map(option => option.openInterest);
 
         console.log('Strikes for ticker', ticker, ':', strikes);
+        console.log('Calls Open Interest:', callsOI);
+        console.log('Puts Open Interest:', putsOI);
 
-        // Increase the range of strikes around the current price
-        const minStrike = Math.max(Math.floor(currentPrice - 50), Math.min(...strikes)); // Increase range
-        const maxStrike = Math.min(Math.ceil(currentPrice + 50), Math.max(...strikes));
+        // Expand the range even more
+        const minStrike = Math.max(Math.floor(currentPrice - 75), Math.min(...strikes));
+        const maxStrike = Math.min(Math.ceil(currentPrice + 75), Math.max(...strikes));
 
-        // Filter strikes within a 50-point range around the current price
+        // Filter strikes within a 75-point range around the current price
         const limitedStrikes = strikes.filter(strike => strike >= minStrike && strike <= maxStrike);
 
         // Ensure calls and puts open interest arrays match the limited strikes
@@ -97,8 +99,8 @@ function renderChart(data, currentPrice) {
         currentChart.destroy();
     }
 
-    const xMin = Math.max(Math.min(...data.strikes), currentPrice - 50);
-    const xMax = Math.min(Math.max(...data.strikes), currentPrice + 50);
+    const xMin = Math.max(Math.min(...data.strikes), currentPrice - 75);
+    const xMax = Math.min(Math.max(...data.strikes), currentPrice + 75);
 
     currentChart = new Chart(ctx, {
         type: 'bar',
