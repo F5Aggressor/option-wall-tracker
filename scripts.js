@@ -41,8 +41,8 @@ async function getOptionsData() {
         const putsOI = putOptions.map(option => option.openInterest);
 
         // Set a dynamic range of 50 points above and below the current price to center the chart
-        const minStrike = currentPrice - 50;
-        const maxStrike = currentPrice + 50;
+        const minStrike = Math.max(currentPrice - 50, Math.min(...strikes));
+        const maxStrike = Math.min(currentPrice + 50, Math.max(...strikes));
 
         // Filter strikes within this range
         const limitedStrikes = strikes.filter(strike => strike >= minStrike && strike <= maxStrike);
