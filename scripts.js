@@ -26,8 +26,6 @@ async function getOptionsData() {
 
         // Fetch options chain from Finnhub.io
         const optionsResponse = await fetch(`https://finnhub.io/api/v1/stock/option-chain?symbol=${ticker}&token=${apiKey}`);
-        console.log('Raw Options Response:', optionsResponse); // Log raw response before parsing
-
         const optionsData = await optionsResponse.json(); // Parse JSON data
         console.log('Parsed Options Data:', optionsData); // Log parsed JSON data
 
@@ -88,10 +86,9 @@ function renderChart(data, currentPrice) {
         currentChart.destroy();
     }
 
-    // Find the closest strike price to the current price
-    const closestStrike = data.strikes.reduce((prev, curr) => {
-        return Math.abs(curr - currentPrice) < Math.abs(prev - currentPrice) ? curr : prev;
-    });
+    // Calculate dynamic min and max for x-axis to center the current price
+    const xMin = Math.max(Math.min(...data.strikes), currentPrice - 20); // Shift left from current price
+    const xMax = Math.min(Math.max(...data.strikes), currentPrice + 20); // Shift right from current price
 
     // Create a new chart instance with proper annotation for the current price
     currentChart = new Chart(ctx, {
@@ -123,6 +120,8 @@ function renderChart(data, currentPrice) {
             scales: {
                 x: {
                     beginAtZero: false, // Show strike prices dynamically
+                    min: xMin, // Dynamic min to center the current price
+                    max: xMax, // Dynamic max to center the current price
                     ticks: {
                         autoSkip: true, // Auto-skip labels for clarity
                         maxRotation: 45,
@@ -138,8 +137,8 @@ function renderChart(data, currentPrice) {
                     annotations: {
                         currentPriceLine: {
                             type: 'line',
-                            scaleID: 'x',
-                            value: closestStrike, // Place the line at the closest strike price
+                            xMin: currentPrice, // Exact current price
+                            xMax: currentPrice, // Exact current price for the vertical line
                             borderColor: 'rgba(0, 0, 0, 0.8)', // Black line for current price
                             borderWidth: 2,
                             label: {
