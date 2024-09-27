@@ -10,6 +10,11 @@ async function getOptionsData() {
     const apiKey = 'crpflppr01qsek0flv0gcrpflppr01qsek0flv10'; // Your Finnhub API key
 
     try {
+        // Clear previous chart instance
+        if (currentChart) {
+            currentChart.destroy();
+        }
+
         // Fetch stock price from Finnhub.io
         const priceResponse = await fetch(`https://finnhub.io/api/v1/quote?symbol=${ticker}&token=${apiKey}`);
         const priceData = await priceResponse.json();
@@ -18,7 +23,7 @@ async function getOptionsData() {
         }
         const currentPrice = priceData.c;
 
-        // Fetch options chain from Finnhub.io for the nearest expiration date (one week out)
+        // Fetch options chain from Finnhub.io
         const optionsResponse = await fetch(`https://finnhub.io/api/v1/stock/option-chain?symbol=${ticker}&token=${apiKey}`);
         const optionsData = await optionsResponse.json();
         if (!optionsData || !optionsData.data || optionsData.data.length === 0) {
@@ -26,7 +31,6 @@ async function getOptionsData() {
             return;
         }
 
-        // Only use the first expiration date (typically one week out)
         const firstOption = optionsData.data[0]; // First expiration date's options
         const callOptions = firstOption.options.CALL;
         const putOptions = firstOption.options.PUT;
@@ -60,6 +64,10 @@ async function getOptionsData() {
         };
 
         renderChart(chartData, currentPrice);
+
+        // Clear the stock ticker input after fetching data
+        document.getElementById('stockTicker').value = '';
+
     } catch (error) {
         console.error('Error fetching data from Finnhub.io:', error);
         alert(`Error: ${error.message}`);
@@ -74,7 +82,7 @@ function renderChart(data, currentPrice) {
         currentChart.destroy();
     }
 
-    // Create a new chart instance with proper annotation for the current price
+    // Create a new chart instance
     currentChart = new Chart(ctx, {
         type: 'bar',
         data: {
@@ -108,30 +116,12 @@ function renderChart(data, currentPrice) {
                 y: {
                     beginAtZero: true // Bars start from 0
                 }
-            },
-            plugins: {
-                annotation: {
-                    annotations: {
-                        currentPriceLine: {
-                            type: 'line',
-                            xMin: currentPrice, // Show the line at the current price position
-                            xMax: currentPrice,
-                            borderColor: 'rgba(0, 0, 0, 0.8)', // Black line for current price
-                            borderWidth: 2,
-                            label: {
-                                enabled: true,
-                                content: `Current Price: $${currentPrice.toFixed(2)}`, // Bubble with price
-                                backgroundColor: 'rgba(0,0,0,0.7)',
-                                color: '#fff',
-                                position: 'center', // Center the label over the line
-                                padding: 6,
-                                xAdjust: -40, // Adjust label placement on the line
-                                yAdjust: -20
-                            }
-                        }
-                    }
-                }
             }
         }
     });
 }
+
+// Increase canvas size to accommodate more data on the X-axis
+const canvas = document.getElementById('optionsChart');
+canvas.width = 800; // Adjust as needed for larger size
+canvas.height = 400; // Adjust height as needed
