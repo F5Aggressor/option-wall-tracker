@@ -26,6 +26,10 @@ async function getOptionsData() {
         // Fetch options chain from Finnhub.io
         const optionsResponse = await fetch(`https://finnhub.io/api/v1/stock/option-chain?symbol=${ticker}&token=${apiKey}`);
         const optionsData = await optionsResponse.json();
+
+        // Log the API response to see the data structure and values
+        console.log('Options API Response:', optionsData);
+
         if (!optionsData || !optionsData.data || optionsData.data.length === 0) {
             alert("No options data available for this ticker.");
             return;
