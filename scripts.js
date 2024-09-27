@@ -186,3 +186,4 @@ const canvas = document.getElementById('optionsChart');
 canvas.width = 1000; // Adjust as needed for larger size
 canvas.height = 500; // Adjust height as needed
 
+
