@@ -42,11 +42,10 @@ async function getOptionsData() {
         const callsOI = callOptions.map(option => option.openInterest || 0); // Fallback to 0 if undefined
         const putsOI = putOptions.map(option => option.openInterest || 0); // Fallback to 0 if undefined
 
-        // Log more detailed data
-        console.log('Strikes and Open Interest:');
-        strikes.forEach((strike, index) => {
-            console.log(`Strike: ${strike}, Calls OI: ${callsOI[index]}, Puts OI: ${putsOI[index]}`);
-        });
+        // ** Add these logs to see detailed data in the console **
+        console.log('Strikes:', strikes);        // Logs the strikes array
+        console.log('Calls Open Interest:', callsOI);  // Logs the calls open interest array
+        console.log('Puts Open Interest:', putsOI);    // Logs the puts open interest array
 
         // Prepare the chart data
         renderChart({ strikes, callsOI, putsOI }, currentPrice);
