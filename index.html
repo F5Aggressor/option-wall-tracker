@@ -15,7 +15,11 @@
             <input type="text" id="stockTicker" placeholder="Enter stock ticker">
             <button onclick="getOptionsData()">Submit</button>
         </div>
-
+        <!-- New box for displaying the searched ticker symbol -->
+        <div id="tickerBox" class="ticker-box">
+        Ticker: <span id="tickerSymbol">-</span>
+        </div>   
+        
         <!-- New box for displaying current stock price -->
         <div id="currentPriceBox" class="price-box">
             Current Price: $<span id="priceValue">-</span>
