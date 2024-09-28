@@ -4,9 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Option Wall Tracker</title>
+    <link rel="stylesheet" href="styles.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation"></script>
-    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="container">
@@ -15,20 +15,24 @@
             <input type="text" id="stockTicker" placeholder="Enter stock ticker">
             <button onclick="getOptionsData()">Submit</button>
         </div>
-        <!-- New box for displaying the searched ticker symbol -->
-        <div id="tickerBox" class="ticker-box">
-        Ticker: <span id="tickerSymbol">-</span>
-        </div>   
-        
-        <!-- New box for displaying current stock price -->
-        <div id="currentPriceBox" class="price-box">
-            Current Price: $<span id="priceValue">-</span>
-        </div>
 
-        <!-- New box for displaying total call/put interest -->
-        <div id="totalInterestBox" class="interest-box">
-            Call Interest: <span id="totalCallInterest">-</span><br>
-            Put Interest: <span id="totalPutInterest">-</span>
+        <!-- Info container for Call/Put Interest and Ticker Symbol -->
+        <div class="info-container">
+            <!-- Call/Put Interest box -->
+            <div id="totalInterestBox" class="interest-box">
+                Call Interest: <span id="totalCallInterest">-</span><br>
+                Put Interest: <span id="totalPutInterest">-</span>
+            </div>
+
+            <!-- Current Price box -->
+            <div id="currentPriceBox" class="price-box">
+                Current Price: $<span id="priceValue">-</span>
+            </div>
+
+            <!-- Ticker Symbol box -->
+            <div id="tickerBox" class="ticker-box">
+                Ticker: <span id="tickerSymbol">-</span>
+            </div>
         </div>
 
         <!-- Dropdown for Expiration Dates -->
@@ -37,6 +41,7 @@
             <select id="expirationDates" onchange="updateOptionsData()"></select>
         </div>
 
+        <!-- Chart container -->
         <div class="canvas-container">
             <canvas id="optionsChart"></canvas>
         </div>
