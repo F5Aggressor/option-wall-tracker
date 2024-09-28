@@ -15,6 +15,13 @@
             <input type="text" id="stockTicker" placeholder="Enter stock ticker">
             <button onclick="getOptionsData()">Submit</button>
         </div>
+        
+        <!-- New Dropdown for Expiration Dates -->
+        <div class="input-section">
+            <label for="expirationDates">Select Expiration Date:</label>
+            <select id="expirationDates" onchange="updateOptionsData()"></select>
+        </div>
+
         <div class="canvas-container">
             <canvas id="optionsChart"></canvas>
         </div>
