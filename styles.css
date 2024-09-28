@@ -1,3 +1,4 @@
+/* Global Styles */
 body {
     font-family: Arial, sans-serif;
     margin: 0;
@@ -9,24 +10,26 @@ body {
     background-color: #f4f4f4;
 }
 
+/* Container for the entire content */
 .container {
     text-align: center;
     background: white;
     padding: 20px;
     border-radius: 8px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    width: 100%;
-    max-width: 1400px;
+    width: 100%; /* Make container take full width */
+    max-width: 1400px; /* Adjust the maximum width of the container */
     margin: auto;
 }
 
+/* Input section for the stock ticker and button */
 .input-section {
     margin-bottom: 20px;
 }
 
 input[type="text"] {
     padding: 10px;
-    width: 60%;
+    width: 60%; /* Adjust the input width */
     margin-right: 10px;
     font-size: 16px;
     border: 1px solid #ccc;
@@ -47,6 +50,7 @@ button:hover {
     background-color: #0056b3;
 }
 
+/* Canvas container for the chart */
 .canvas-container {
     display: flex;
     justify-content: center;
@@ -54,10 +58,47 @@ button:hover {
 }
 
 canvas {
-    max-width: 100%;
-    max-height: 80vh;
+    max-width: 100%; /* Make the canvas responsive */
+    max-height: 80vh; /* Ensure the chart doesn't overflow vertically */
     height: auto;
     width: auto;
+}
+
+/* Styling for the current price box */
+.price-box {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    padding: 10px;
+    background-color: #007bff;
+    color: white;
+    border-radius: 8px;
+    display: inline-block;
+    text-align: center;
+    width: auto;
+    margin: 0 auto; /* Center horizontally */
+}
+
+.price-box span {
+    font-size: 24px;
+}
+
+/* New styling for the total call/put interest box */
+.interest-box {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    font-size: 16px;
+    font-weight: bold;
+    background-color: rgba(255, 255, 255, 0.8);
+    padding: 10px;
+    border: 2px solid #ccc;
+    border-radius: 8px;
+    color: black;
+}
+
+.interest-box span {
+    font-size: 16px;
 }
 
 /* Media Query for small screens */
@@ -72,5 +113,4 @@ canvas {
     }
 }
 
-}
 
