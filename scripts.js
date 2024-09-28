@@ -57,75 +57,55 @@ async function getOptionsData() {
 }
 
 
-function renderChart(data, currentPrice) {
-    const ctx = document.getElementById('optionsChart').getContext('2d');
+const xMin = Math.max(Math.min(...data.strikes), currentPrice - 75);
+const xMax = Math.min(Math.max(...data.strikes), currentPrice + 75);
 
-    if (currentChart) {
-        currentChart.destroy();
-    }
-
-    // Create the chart
-    currentChart = new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: data.strikes,
-            datasets: [
-                {
-                    label: 'Calls Open Interest',
-                    data: data.callsOI,
-                    backgroundColor: 'rgba(75, 192, 192, 0.7)',
-                    borderColor: 'rgba(75, 192, 192, 1)',
-                    borderWidth: 1,
-                },
-                {
-                    label: 'Puts Open Interest',
-                    data: data.putsOI,
-                    backgroundColor: 'rgba(255, 99, 132, 0.7)',
-                    borderColor: 'rgba(255, 99, 132, 1)',
-                    borderWidth: 1,
-                }
-            ]
-        },
-        options: {
-            scales: {
-                x: {
-                    beginAtZero: true,
-                    title: {
-                        display: true,
-                        text: 'Strike Prices'
-                    }
-                },
-                y: {
-                    beginAtZero: true,
-                    title: {
-                        display: true,
-                        text: 'Open Interest'
-                    }
-                }
+currentChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+        labels: data.strikes,
+        datasets: [
+            {
+                label: 'Calls Open Interest',
+                data: data.callsOI,
+                backgroundColor: 'rgba(75, 192, 192, 0.7)',
+                borderColor: 'rgba(75, 192, 192, 1)',
+                borderWidth: 1
             },
-            plugins: {
-                annotation: {
-                    annotations: {
-                        line1: {
-                            type: 'line',
-                            scaleID: 'x',
-                            value: currentPrice,  // Position the line at the current price
-                            borderColor: 'black',
-                            borderWidth: 2,
-                            label: {
-                                content: `Current Price: $${currentPrice}`,
-                                enabled: true,
-                                position: 'center',
-                                backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                                color: 'white'
-                            }
+            {
+                label: 'Puts Open Interest',
+                data: data.putsOI,
+                backgroundColor: 'rgba(255, 99, 132, 0.7)',
+                borderColor: 'rgba(255, 99, 132, 1)',
+                borderWidth: 1
+            }
+        ]
+    },
+    options: {
+        scales: {
+            x: {
+                min: xMin,
+                max: xMax
+            }
+        },
+        plugins: {
+            annotation: {
+                annotations: {
+                    currentPriceLine: {
+                        type: 'line',
+                        scaleID: 'x',
+                        value: currentPrice,  // Place the line exactly at the current price
+                        borderColor: 'rgba(0, 0, 0, 0.8)',
+                        borderWidth: 2,
+                        label: {
+                            enabled: true,
+                            content: `Current Price: $${currentPrice.toFixed(2)}`,
+                            backgroundColor: 'rgba(0, 0, 0, 0.7)',
+                            color: '#fff'
                         }
                     }
                 }
             }
         }
-    });
-}
-
-
-
+    }
+});
