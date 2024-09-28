@@ -70,7 +70,6 @@ async function getOptionsData() {
     }
 }
 
-
 function updateOptionsData() {
     const selectedExpiration = document.getElementById('expirationDates').value;
     const selectedOptionData = optionsDataCache[selectedExpiration];
@@ -92,13 +91,12 @@ function updateOptionsData() {
     const totalCallInterest = callsOI.reduce((sum, oi) => sum + oi, 0);
     const totalPutInterest = putsOI.reduce((sum, oi) => sum + oi, 0);
 
+    console.log("Total Call Interest:", totalCallInterest);
+    console.log("Total Put Interest:", totalPutInterest);
+
     // Update the total interest box
     document.getElementById('totalCallInterest').innerText = totalCallInterest;
     document.getElementById('totalPutInterest').innerText = totalPutInterest;
-
-    console.log('Strikes:', strikes);
-    console.log('Calls Open Interest:', callsOI);
-    console.log('Puts Open Interest:', putsOI);
 
     const chartData = {
         strikes,
@@ -192,6 +190,3 @@ document.getElementById('stockTicker').addEventListener('keypress', function (ev
         getOptionsData();
     }
 });
-
-});
-
