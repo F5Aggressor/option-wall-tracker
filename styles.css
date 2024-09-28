@@ -67,6 +67,25 @@ canvas {
     width: auto;
 }
 
+/* Styling for the new ticker symbol box */
+.ticker-box {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    font-size: 16px;
+    font-weight: bold;
+    background-color: rgba(255, 255, 255, 0.1); /* Light translucent background */
+    padding: 10px;
+    border: 2px solid #666; /* Darker border */
+    border-radius: 8px;
+    color: white; /* Light text for better contrast */
+}
+
+.ticker-box span {
+    font-size: 16px;
+}
+
+
 /* Styling for the current price box */
 .price-box {
     font-size: 24px;
