@@ -50,33 +50,11 @@ async function getOptionsData() {
         console.log('Calls Open Interest:', callsOI);
         console.log('Puts Open Interest:', putsOI);
 
-        // Define a wider range around the current price
-        const minStrike = Math.max(Math.floor(currentPrice - 75), Math.min(...strikes));
-        const maxStrike = Math.min(Math.ceil(currentPrice + 75), Math.max(...strikes));
-
-        // Filter strikes within the desired range
-        const limitedStrikes = strikes.filter(strike => strike >= minStrike && strike <= maxStrike);
-
-        // Ensure calls and puts open interest arrays match the filtered strikes
-        const limitedCallsOI = limitedStrikes.map(strike => {
-            const index = strikes.indexOf(strike);
-            return index > -1 ? callsOI[index] : 0;
-        });
-        const limitedPutsOI = limitedStrikes.map(strike => {
-            const index = strikes.indexOf(strike);
-            return index > -1 ? putsOI[index] : 0;
-        });
-
         const chartData = {
-            strikes: limitedStrikes,
-            callsOI: limitedCallsOI,
-            putsOI: limitedPutsOI
+            strikes,
+            callsOI,
+            putsOI
         };
-
-        // Log the filtered strikes and open interests for debugging
-        console.log('Filtered Strikes:', limitedStrikes);
-        console.log('Filtered Calls OI:', limitedCallsOI);
-        console.log('Filtered Puts OI:', limitedPutsOI);
 
         renderChart(chartData, currentPrice);
 
@@ -96,11 +74,8 @@ function renderChart(data, currentPrice) {
         currentChart.destroy();
     }
 
-    // Define the X-axis range to include the current price
-    const xMin = Math.max(Math.min(...data.strikes), currentPrice - 75);
-    const xMax = Math.min(Math.max(...data.strikes), currentPrice + 75);
-
-    console.log('X-axis Range:', { xMin, xMax });
+    // Log annotation data
+    console.log('Rendering vertical line at:', currentPrice);
 
     currentChart = new Chart(ctx, {
         type: 'bar',
@@ -130,8 +105,6 @@ function renderChart(data, currentPrice) {
         options: {
             scales: {
                 x: {
-                    min: xMin,
-                    max: xMax,
                     ticks: {
                         autoSkip: true,
                         maxRotation: 45,
@@ -148,7 +121,7 @@ function renderChart(data, currentPrice) {
                         currentPriceLine: {
                             type: 'line',
                             scaleID: 'x',
-                            value: currentPrice,  // This should reflect the actual currentPrice
+                            value: currentPrice,  // Place the line exactly at the current price
                             borderColor: 'rgba(0, 0, 0, 0.8)',
                             borderWidth: 2,
                             label: {
@@ -178,4 +151,3 @@ document.getElementById('stockTicker').addEventListener('keypress', function (ev
         getOptionsData();
     }
 });
-
