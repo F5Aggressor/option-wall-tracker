@@ -26,6 +26,9 @@ async function getOptionsData() {
         const currentPrice = priceData.c;
         console.log('Current Price:', currentPrice);  // Log current price
 
+          // Add the console log right here
+        console.log('Current Price:', currentPrice);
+
         // Fetch options chain from Finnhub.io
         const optionsResponse = await fetch(`https://finnhub.io/api/v1/stock/option-chain?symbol=${ticker}&token=${apiKey}`);
         const optionsData = await optionsResponse.json();
