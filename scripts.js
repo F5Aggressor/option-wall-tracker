@@ -24,9 +24,8 @@ async function getOptionsData() {
         }
 
         const currentPrice = priceData.c;
-        console.log('Current Price:', currentPrice);  // Log current price
 
-          // Add the console log right here
+        // Log the current price for debugging
         console.log('Current Price:', currentPrice);
 
         // Fetch options chain from Finnhub.io
@@ -34,24 +33,54 @@ async function getOptionsData() {
         const optionsData = await optionsResponse.json();
 
         if (!optionsData || !optionsData.data || optionsData.data.length === 0) {
-            throw new Error("No options data available.");
+            alert("No options data available for this ticker.");
+            return;
         }
 
-        const firstOption = optionsData.data[0]; // First expiration date
+        const firstOption = optionsData.data[0]; // First expiration date's options
         const callOptions = firstOption.options.CALL;
         const putOptions = firstOption.options.PUT;
 
-        // Extract strikes, calls, and puts open interest
+        // Extract strikes, calls open interest, and puts open interest
         const strikes = callOptions.map(option => option.strike);
-        const callsOI = callOptions.map(option => option.openInterest || 0); // Fallback to 0 if undefined
-        const putsOI = putOptions.map(option => option.openInterest || 0); // Fallback to 0 if undefined
+        const callsOI = callOptions.map(option => option.openInterest);
+        const putsOI = putOptions.map(option => option.openInterest);
 
-        console.log('Strikes:', strikes);        // Log the strikes array
-        console.log('Calls Open Interest:', callsOI);  // Log the calls open interest array
-        console.log('Puts Open Interest:', putsOI);    // Log the puts open interest array
+        console.log('Strikes:', strikes);
+        console.log('Calls Open Interest:', callsOI);
+        console.log('Puts Open Interest:', putsOI);
 
-        // Prepare the chart data
-        renderChart({ strikes, callsOI, putsOI }, currentPrice);
+        // Define a wider range around the current price
+        const minStrike = Math.max(Math.floor(currentPrice - 75), Math.min(...strikes));
+        const maxStrike = Math.min(Math.ceil(currentPrice + 75), Math.max(...strikes));
+
+        // Filter strikes within the desired range
+        const limitedStrikes = strikes.filter(strike => strike >= minStrike && strike <= maxStrike);
+
+        // Ensure calls and puts open interest arrays match the filtered strikes
+        const limitedCallsOI = limitedStrikes.map(strike => {
+            const index = strikes.indexOf(strike);
+            return index > -1 ? callsOI[index] : 0;
+        });
+        const limitedPutsOI = limitedStrikes.map(strike => {
+            const index = strikes.indexOf(strike);
+            return index > -1 ? putsOI[index] : 0;
+        });
+
+        const chartData = {
+            strikes: limitedStrikes,
+            callsOI: limitedCallsOI,
+            putsOI: limitedPutsOI
+        };
+
+        // Log the filtered strikes and open interests for debugging
+        console.log('Filtered Strikes:', limitedStrikes);
+        console.log('Filtered Calls OI:', limitedCallsOI);
+        console.log('Filtered Puts OI:', limitedPutsOI);
+
+        renderChart(chartData, currentPrice);
+
+        document.getElementById('stockTicker').value = ''; // Clear the input
 
     } catch (error) {
         console.error('Error:', error);
@@ -62,14 +91,16 @@ async function getOptionsData() {
 function renderChart(data, currentPrice) {
     const ctx = document.getElementById('optionsChart').getContext('2d');
 
+    // Destroy the previous chart if it exists
     if (currentChart) {
         currentChart.destroy();
     }
 
-    // Calculate the min and max strike price ranges for the chart
+    // Define the X-axis range to include the current price
     const xMin = Math.max(Math.min(...data.strikes), currentPrice - 75);
     const xMax = Math.min(Math.max(...data.strikes), currentPrice + 75);
-    console.log('X-axis Range:', { xMin, xMax });  // Log X-axis range
+
+    console.log('X-axis Range:', { xMin, xMax });
 
     currentChart = new Chart(ctx, {
         type: 'bar',
@@ -81,14 +112,18 @@ function renderChart(data, currentPrice) {
                     data: data.callsOI,
                     backgroundColor: 'rgba(75, 192, 192, 0.7)',
                     borderColor: 'rgba(75, 192, 192, 1)',
-                    borderWidth: 1
+                    borderWidth: 1,
+                    categoryPercentage: 0.5,
+                    barPercentage: 0.8
                 },
                 {
                     label: 'Puts Open Interest',
                     data: data.putsOI,
                     backgroundColor: 'rgba(255, 99, 132, 0.7)',
                     borderColor: 'rgba(255, 99, 132, 1)',
-                    borderWidth: 1
+                    borderWidth: 1,
+                    categoryPercentage: 0.5,
+                    barPercentage: 0.8
                 }
             ]
         },
@@ -102,6 +137,9 @@ function renderChart(data, currentPrice) {
                         maxRotation: 45,
                         minRotation: 45
                     }
+                },
+                y: {
+                    beginAtZero: true
                 }
             },
             plugins: {
@@ -110,24 +148,34 @@ function renderChart(data, currentPrice) {
                         currentPriceLine: {
                             type: 'line',
                             scaleID: 'x',
-                            value: currentPrice,  // Ensure this is the actual current price
+                            value: currentPrice,  // This should reflect the actual currentPrice
                             borderColor: 'rgba(0, 0, 0, 0.8)',
                             borderWidth: 2,
                             label: {
                                 enabled: true,
                                 content: `Current Price: $${currentPrice.toFixed(2)}`,
                                 backgroundColor: 'rgba(0, 0, 0, 0.7)',
-                                color: '#fff'
+                                color: '#fff',
+                                position: 'end',
+                                padding: 6
                             }
                         }
                     }
+                }
+            },
+            layout: {
+                padding: {
+                    right: 50
                 }
             }
         }
     });
 }
 
-// Increase canvas size to accommodate more data on the X-axis
-const canvas = document.getElementById('optionsChart');
-canvas.width = 1200;
-canvas.height = 600;
+// Adding event listener to handle Enter key submission
+document.getElementById('stockTicker').addEventListener('keypress', function (event) {
+    if (event.key === 'Enter') {
+        getOptionsData();
+    }
+});
+
