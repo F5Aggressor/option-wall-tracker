@@ -15,8 +15,19 @@
             <input type="text" id="stockTicker" placeholder="Enter stock ticker">
             <button onclick="getOptionsData()">Submit</button>
         </div>
-        
-        <!-- New Dropdown for Expiration Dates -->
+
+        <!-- New box for displaying current stock price -->
+        <div id="currentPriceBox" class="price-box">
+            Current Price: $<span id="priceValue">-</span>
+        </div>
+
+        <!-- New box for displaying total call/put interest -->
+        <div id="totalInterestBox" class="interest-box">
+            Call Interest: <span id="totalCallInterest">-</span><br>
+            Put Interest: <span id="totalPutInterest">-</span>
+        </div>
+
+        <!-- Dropdown for Expiration Dates -->
         <div class="input-section">
             <label for="expirationDates">Select Expiration Date:</label>
             <select id="expirationDates" onchange="updateOptionsData()"></select>
