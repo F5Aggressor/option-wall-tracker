@@ -15,8 +15,8 @@ body {
     padding: 20px;
     border-radius: 8px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    width: 100%; /* Make container take full width */
-    max-width: 1400px; /* Adjust the maximum width of the container */
+    width: 100%;
+    max-width: 1400px;
     margin: auto;
 }
 
@@ -26,7 +26,7 @@ body {
 
 input[type="text"] {
     padding: 10px;
-    width: 60%; /* Adjust the input width */
+    width: 60%;
     margin-right: 10px;
     font-size: 16px;
     border: 1px solid #ccc;
@@ -54,9 +54,23 @@ button:hover {
 }
 
 canvas {
-    max-width: 100%; /* Make the canvas responsive */
-    max-height: 80vh; /* Ensure the chart doesn't overflow vertically */
+    max-width: 100%;
+    max-height: 80vh;
     height: auto;
     width: auto;
+}
+
+/* Media Query for small screens */
+@media (max-width: 768px) {
+    input[type="text"] {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+
+    button {
+        width: 100%;
+    }
+}
+
 }
 
