@@ -125,8 +125,8 @@ function renderChart(data, currentPrice) {
                 {
                     label: 'Calls Open Interest',
                     data: data.callsOI,
-                    backgroundColor: 'rgba(75, 192, 192, 0.7)',
-                    borderColor: 'rgba(75, 192, 192, 1)',
+                    backgroundColor: 'rgba(102, 187, 106, 0.8)', // Green for calls
+                    borderColor: 'rgba(76, 175, 80, 1)', // Dark green border for calls
                     borderWidth: 1,
                     categoryPercentage: 0.5,
                     barPercentage: 0.8
@@ -134,8 +134,8 @@ function renderChart(data, currentPrice) {
                 {
                     label: 'Puts Open Interest',
                     data: data.putsOI,
-                    backgroundColor: 'rgba(255, 99, 132, 0.7)',
-                    borderColor: 'rgba(255, 99, 132, 1)',
+                    backgroundColor: 'rgba(239, 83, 80, 0.8)', // Red for puts
+                    borderColor: 'rgba(244, 67, 54, 1)', // Dark red border for puts
                     borderWidth: 1,
                     categoryPercentage: 0.5,
                     barPercentage: 0.8
@@ -148,11 +148,33 @@ function renderChart(data, currentPrice) {
                     ticks: {
                         autoSkip: true,
                         maxRotation: 45,
-                        minRotation: 45
+                        minRotation: 45,
+                        color: '#e0e0e0' // Light grey text for x-axis labels
+                    },
+                    grid: {
+                        color: '#555555' // Slightly lighter grid lines
                     }
                 },
                 y: {
-                    beginAtZero: true
+                    beginAtZero: true,
+                    ticks: {
+                        color: '#e0e0e0' // Light grey text for y-axis labels
+                    },
+                    grid: {
+                        color: '#555555' // Slightly lighter grid lines
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    labels: {
+                        color: '#e0e0e0' // Light grey text for the legend
+                    }
+                },
+                tooltip: {
+                    backgroundColor: '#4a4a4a', // Dark tooltip background
+                    titleColor: '#f4f4f4', // Light tooltip title
+                    bodyColor: '#f4f4f4' // Light tooltip body text
                 }
             },
             layout: {
@@ -169,5 +191,7 @@ document.getElementById('stockTicker').addEventListener('keypress', function (ev
     if (event.key === 'Enter') {
         getOptionsData();
     }
+});
+
 });
 
