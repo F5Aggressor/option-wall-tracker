@@ -1,4 +1,6 @@
 let currentChart = null; // Store the chart instance
+let optionsDataCache = {}; // Cache the options data for different expiration dates
+let currentPrice = null;
 
 async function getOptionsData() {
     const ticker = document.getElementById('stockTicker').value;
@@ -23,7 +25,7 @@ async function getOptionsData() {
             throw new Error(`Failed to retrieve current price for ${ticker}`);
         }
 
-        const currentPrice = priceData.c;
+        currentPrice = priceData.c;
 
         // Log the current price for debugging
         console.log('Current Price:', currentPrice);
@@ -37,26 +39,24 @@ async function getOptionsData() {
             return;
         }
 
-        const firstOption = optionsData.data[0]; // First expiration date's options
-        const callOptions = firstOption.options.CALL;
-        const putOptions = firstOption.options.PUT;
+        // Cache the options data
+        optionsDataCache = optionsData.data.reduce((acc, option) => {
+            acc[option.expirationDate] = option;
+            return acc;
+        }, {});
 
-        // Extract strikes, calls open interest, and puts open interest
-        const strikes = callOptions.map(option => option.strike);
-        const callsOI = callOptions.map(option => option.openInterest);
-        const putsOI = putOptions.map(option => option.openInterest);
+        // Populate the expiration dates dropdown
+        const expirationDropdown = document.getElementById('expirationDates');
+        expirationDropdown.innerHTML = ''; // Clear previous entries
+        optionsData.data.forEach(option => {
+            const optionElement = document.createElement('option');
+            optionElement.value = option.expirationDate;
+            optionElement.text = option.expirationDate;
+            expirationDropdown.appendChild(optionElement);
+        });
 
-        console.log('Strikes:', strikes);
-        console.log('Calls Open Interest:', callsOI);
-        console.log('Puts Open Interest:', putsOI);
-
-        const chartData = {
-            strikes,
-            callsOI,
-            putsOI
-        };
-
-        renderChart(chartData, currentPrice);
+        // Automatically fetch and update the chart with the first expiration date's data
+        updateOptionsData();
 
         document.getElementById('stockTicker').value = ''; // Clear the input
 
@@ -64,6 +64,36 @@ async function getOptionsData() {
         console.error('Error:', error);
         alert(error.message);
     }
+}
+
+function updateOptionsData() {
+    const selectedExpiration = document.getElementById('expirationDates').value;
+    const selectedOptionData = optionsDataCache[selectedExpiration];
+
+    if (!selectedOptionData) {
+        alert("No data available for this expiration date.");
+        return;
+    }
+
+    const callOptions = selectedOptionData.options.CALL;
+    const putOptions = selectedOptionData.options.PUT;
+
+    // Extract strikes, calls open interest, and puts open interest
+    const strikes = callOptions.map(option => option.strike);
+    const callsOI = callOptions.map(option => option.openInterest);
+    const putsOI = putOptions.map(option => option.openInterest);
+
+    console.log('Strikes:', strikes);
+    console.log('Calls Open Interest:', callsOI);
+    console.log('Puts Open Interest:', putsOI);
+
+    const chartData = {
+        strikes,
+        callsOI,
+        putsOI
+    };
+
+    renderChart(chartData, currentPrice);
 }
 
 function renderChart(data, currentPrice) {
