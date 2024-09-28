@@ -26,9 +26,13 @@ async function getOptionsData() {
         }
 
         currentPrice = priceData.c;
+        console.log("Current Price:", currentPrice);
 
         // Update the current price box
         document.getElementById('priceValue').innerText = currentPrice.toFixed(2);
+
+        // Update the ticker symbol in the new ticker box
+        document.getElementById('tickerSymbol').innerText = ticker.toUpperCase();
 
         // Fetch options chain from Finnhub.io
         const optionsResponse = await fetch(`https://finnhub.io/api/v1/stock/option-chain?symbol=${ticker}&token=${apiKey}`);
@@ -65,6 +69,7 @@ async function getOptionsData() {
         alert(error.message);
     }
 }
+
 
 function updateOptionsData() {
     const selectedExpiration = document.getElementById('expirationDates').value;
