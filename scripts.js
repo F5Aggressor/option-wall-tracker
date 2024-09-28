@@ -27,8 +27,8 @@ async function getOptionsData() {
 
         currentPrice = priceData.c;
 
-        // Log the current price for debugging
-        console.log('Current Price:', currentPrice);
+        // Update the current price box
+        document.getElementById('priceValue').innerText = currentPrice.toFixed(2);
 
         // Fetch options chain from Finnhub.io
         const optionsResponse = await fetch(`https://finnhub.io/api/v1/stock/option-chain?symbol=${ticker}&token=${apiKey}`);
@@ -83,6 +83,14 @@ function updateOptionsData() {
     const callsOI = callOptions.map(option => option.openInterest);
     const putsOI = putOptions.map(option => option.openInterest);
 
+    // Calculate total Call and Put interest
+    const totalCallInterest = callsOI.reduce((sum, oi) => sum + oi, 0);
+    const totalPutInterest = putsOI.reduce((sum, oi) => sum + oi, 0);
+
+    // Update the total interest box
+    document.getElementById('totalCallInterest').innerText = totalCallInterest;
+    document.getElementById('totalPutInterest').innerText = totalPutInterest;
+
     console.log('Strikes:', strikes);
     console.log('Calls Open Interest:', callsOI);
     console.log('Puts Open Interest:', putsOI);
@@ -103,9 +111,6 @@ function renderChart(data, currentPrice) {
     if (currentChart) {
         currentChart.destroy();
     }
-
-    // Log annotation data
-    console.log('Rendering vertical line at:', currentPrice);
 
     currentChart = new Chart(ctx, {
         type: 'bar',
@@ -145,27 +150,6 @@ function renderChart(data, currentPrice) {
                     beginAtZero: true
                 }
             },
-            plugins: {
-                annotation: {
-                    annotations: {
-                        currentPriceLine: {
-                            type: 'line',
-                            scaleID: 'x',
-                            value: currentPrice,  // Place the line exactly at the current price
-                            borderColor: 'rgba(0, 0, 0, 0.8)',
-                            borderWidth: 2,
-                            label: {
-                                enabled: true,
-                                content: `Current Price: $${currentPrice.toFixed(2)}`,
-                                backgroundColor: 'rgba(0, 0, 0, 0.7)',
-                                color: '#fff',
-                                position: 'end',
-                                padding: 6
-                            }
-                        }
-                    }
-                }
-            },
             layout: {
                 padding: {
                     right: 50
@@ -181,3 +165,4 @@ document.getElementById('stockTicker').addEventListener('keypress', function (ev
         getOptionsData();
     }
 });
+
