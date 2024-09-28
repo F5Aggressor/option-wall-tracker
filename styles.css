@@ -7,16 +7,17 @@ body {
     justify-content: center;
     align-items: center;
     height: 100vh;
-    background-color: #f4f4f4;
+    background-color: #2e2e2e; /* Dark gray background */
+    color: #f4f4f4; /* Light text color */
 }
 
 /* Container for the entire content */
 .container {
     text-align: center;
-    background: white;
+    background: #3b3b3b; /* Slightly lighter gray for container */
     padding: 20px;
     border-radius: 8px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5); /* Darker shadow */
     width: 100%; /* Make container take full width */
     max-width: 1400px; /* Adjust the maximum width of the container */
     margin: auto;
@@ -32,22 +33,24 @@ input[type="text"] {
     width: 60%; /* Adjust the input width */
     margin-right: 10px;
     font-size: 16px;
-    border: 1px solid #ccc;
+    border: 1px solid #666; /* Darker border for input */
     border-radius: 4px;
+    background-color: #4a4a4a; /* Dark gray input background */
+    color: #f4f4f4; /* Light text inside input */
 }
 
 button {
     padding: 10px 15px;
     font-size: 16px;
     border: none;
-    background-color: #007bff;
+    background-color: #007bff; /* Blue button */
     color: white;
     border-radius: 4px;
     cursor: pointer;
 }
 
 button:hover {
-    background-color: #0056b3;
+    background-color: #0056b3; /* Darker blue on hover */
 }
 
 /* Canvas container for the chart */
@@ -90,11 +93,11 @@ canvas {
     left: 20px;
     font-size: 16px;
     font-weight: bold;
-    background-color: rgba(255, 255, 255, 0.8);
+    background-color: rgba(255, 255, 255, 0.1); /* Light translucent background */
     padding: 10px;
-    border: 2px solid #ccc;
+    border: 2px solid #666; /* Darker border */
     border-radius: 8px;
-    color: black;
+    color: white; /* Light text for better contrast */
 }
 
 .interest-box span {
@@ -112,5 +115,4 @@ canvas {
         width: 100%;
     }
 }
-
 
