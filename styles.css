@@ -7,19 +7,19 @@ body {
     justify-content: center;
     align-items: center;
     height: 100vh; /* Full viewport height */
-    background-color: #2e2e2e; /* Dark gray background */
-    color: #f4f4f4; /* Light text color */
+    background-color: #1f1f1f; /* Darker gray for background */
+    color: #e0e0e0; /* Softer light color for text */
     overflow: hidden; /* Prevent scrolling */
 }
 
 /* Container for the entire content */
 .container {
     text-align: center;
-    background: #3b3b3b; /* Slightly lighter gray for container */
+    background: #2a2a2a; /* Lighter but still dark gray for container */
     padding: 20px;
     border-radius: 8px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5); /* Darker shadow */
-    width: 100%; /* Make container take full width */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.7); /* Darker shadow */
+    width: 100%;
     max-width: 1400px; /* Adjust the maximum width of the container */
     margin: auto;
 }
@@ -34,24 +34,24 @@ input[type="text"] {
     width: 50%; /* Adjust the input width */
     margin-right: 10px;
     font-size: 16px;
-    border: 1px solid #666; /* Darker border for input */
+    border: 1px solid #555; /* Slightly darker border for input */
     border-radius: 4px;
-    background-color: #4a4a4a; /* Dark gray input background */
-    color: #f4f4f4; /* Light text inside input */
+    background-color: #333; /* Dark gray input background */
+    color: #f1f1f1; /* Lighter text inside input */
 }
 
 button {
     padding: 10px 15px;
     font-size: 16px;
     border: none;
-    background-color: #999999; /* Light grey button */
-    color: #333333; /* Dark grey font */
+    background-color: #f2994a; /* Accent color (Orange) for button */
+    color: #1f1f1f; /* Dark gray for contrast with orange */
     border-radius: 4px;
     cursor: pointer;
 }
 
 button:hover {
-    background-color: #777777; /* Darker grey on hover */
+    background-color: #e98e2c; /* Darker orange on hover */
 }
 
 /* Canvas container for the chart */
@@ -76,8 +76,8 @@ canvas {
     font-weight: bold;
     margin-bottom: 10px; /* Reduce margin to save vertical height */
     padding: 10px;
-    background-color: #999999; /* Light grey */
-    color: #333333; /* Dark grey text */
+    background-color: #27ae60; /* Green to indicate financial information */
+    color: #f4f4f4; /* Light text for contrast */
     border-radius: 4px; /* Square off the edges */
     display: inline-block;
     text-align: center;
@@ -95,18 +95,28 @@ canvas {
     margin-top: 10px; /* Reduce margin to save vertical height */
 }
 
-.interest-box, .ticker-box {
+.interest-box {
     font-size: 16px;
     font-weight: bold;
-    background-color: rgba(255, 255, 255, 0.1); /* Light translucent background */
+    background-color: rgba(255, 255, 255, 0.05); /* Lighter translucent background */
     padding: 10px;
-    border: 2px solid #666; /* Darker border */
+    border: 2px solid #777; /* Darker border */
     border-radius: 8px;
-    color: white; /* Light text for better contrast */
+    color: #f4f4f4; /* Light text for better contrast */
     margin: 0 10px; /* Reduce margins to save space */
 }
 
-.interest-box span, .ticker-box span {
+/* Call Interest Specific Styling */
+.call-interest {
+    color: #27ae60; /* Green color for call interest */
+}
+
+/* Put Interest Specific Styling */
+.put-interest {
+    color: #e74c3c; /* Red color for put interest */
+}
+
+.interest-box span {
     font-size: 16px;
 }
 
