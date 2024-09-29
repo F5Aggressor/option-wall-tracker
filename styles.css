@@ -76,8 +76,8 @@ canvas {
     font-weight: bold;
     margin-bottom: 10px; /* Reduce margin to save vertical height */
     padding: 10px;
-    background-color: #27ae60; /* Green to indicate financial information */
-    color: #f4f4f4; /* Light text for contrast */
+    background-color: #2ecc71; /* Softer green for the current price */
+    color: #1f1f1f; /* Darker text for better readability */
     border-radius: 4px; /* Square off the edges */
     display: inline-block;
     text-align: center;
@@ -90,11 +90,12 @@ canvas {
 /* Position call and put interest around the current price box */
 .info-container {
     display: flex;
-    justify-content: center;
+    justify-content: space-around; /* Space the elements evenly */
     align-items: center;
     margin-top: 10px; /* Reduce margin to save vertical height */
 }
 
+/* Interest boxes for calls and puts */
 .interest-box {
     font-size: 16px;
     font-weight: bold;
@@ -116,8 +117,17 @@ canvas {
     color: #e74c3c; /* Red color for put interest */
 }
 
-.interest-box span {
-    font-size: 16px;
+/* Overall Open Interest Box */
+.oi-box {
+    font-size: 18px;
+    font-weight: bold;
+    background-color: rgba(255, 255, 255, 0.1); /* Light translucent background */
+    padding: 12px;
+    border: 2px solid #666; /* Darker border */
+    border-radius: 8px;
+    color: #f4f4f4; /* Light text */
+    margin: 0 10px;
+    display: inline-block;
 }
 
 /* Media Query for small screens */
@@ -129,5 +139,9 @@ canvas {
 
     button {
         width: 100%;
+    }
+
+    .info-container {
+        flex-direction: column; /* Stack elements on top of each other */
     }
 }
