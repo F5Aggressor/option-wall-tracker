@@ -98,6 +98,9 @@ function updateOptionsData() {
     document.getElementById('totalCallInterest').innerText = totalCallInterest;
     document.getElementById('totalPutInterest').innerText = totalPutInterest;
 
+    // Update Overall OI
+    updateOverallOI(totalCallInterest, totalPutInterest);
+
     const chartData = {
         strikes,
         callsOI,
@@ -105,6 +108,15 @@ function updateOptionsData() {
     };
 
     renderChart(chartData, currentPrice);
+}
+
+// Function to calculate and update the overall OI
+function updateOverallOI(totalCallInterest, totalPutInterest) {
+    const overallOI = totalCallInterest - totalPutInterest;
+    const oiBox = document.getElementById('overallOIValue');
+    
+    // Add a "+" sign if the overall OI is positive
+    oiBox.textContent = (overallOI > 0 ? '+' : '') + overallOI;
 }
 
 function renderChart(data, currentPrice) {
