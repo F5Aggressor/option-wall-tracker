@@ -130,6 +130,40 @@ canvas {
     display: inline-block;
 }
 
+/* Gamma Level Box */
+.gamma-box {
+    font-size: 18px;
+    font-weight: bold;
+    padding: 10px;
+    border: 2px solid #555; /* Darker border */
+    border-radius: 8px;
+    margin: 0 10px;
+    text-align: center;
+    display: inline-block;
+}
+
+/* Label for indicating positive or negative */
+.gamma-label {
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+/* Gamma value styling */
+.gamma-value {
+    font-size: 24px;
+}
+
+/* Positive gamma styling */
+.gamma-positive .gamma-label {
+    color: #27ae60; /* Green for positive */
+}
+
+/* Negative gamma styling */
+.gamma-negative .gamma-label {
+    color: #e74c3c; /* Red for negative */
+}
+
 /* Media Query for small screens */
 @media (max-width: 768px) {
     input[type="text"] {
