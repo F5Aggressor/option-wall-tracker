@@ -152,3 +152,4 @@ document.getElementById("show-price-movements").addEventListener("click", () => 
 
 
 
+
