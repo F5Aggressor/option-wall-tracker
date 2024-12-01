@@ -11,23 +11,45 @@
   <div class="container">
     <h1>Day Trading Risk Management Tool</h1>
 
-    <!-- Input Section -->
+    <!-- Portfolio-Based Risk -->
+    <div class="input-section">
+      <div class="input-group">
+        <label for="portfolio-size">Portfolio Size:</label>
+        <input type="number" id="portfolio-size" placeholder="Enter portfolio size">
+      </div>
+      <div class="input-group">
+        <label for="risk-appetite">Risk Appetite:</label>
+        <select id="risk-appetite">
+          <option value="0.005">Conservative (0.5%)</option>
+          <option value="0.01">Moderate (1%)</option>
+          <option value="0.05">Aggressive (5%)</option>
+          <option value="0.1">Ultra Aggressive (10%)</option>
+        </select>
+      </div>
+      <button id="calculate-risk">Calculate Risk</button>
+      <div id="risk-summary"></div>
+    </div>
+
+    <!-- Position Planning -->
     <div class="input-section">
       <div class="input-group">
         <label for="stock-ticker">Stock Ticker:</label>
         <input type="text" id="stock-ticker" placeholder="Enter ticker symbol">
       </div>
-
       <div class="input-group">
         <label for="stock-price">Stock Price:</label>
         <input type="number" id="stock-price" step="0.01" placeholder="Auto-populated" readonly>
       </div>
+      <button id="fetch-stock-price">Fetch Stock Price</button>
+      <div id="position-summary"></div>
+    </div>
 
+    <!-- Stop Loss and PNL -->
+    <div class="input-section">
       <div class="input-group">
         <label for="stop-loss">Stop Loss Price:</label>
         <input type="number" id="stop-loss" step="0.01" placeholder="Enter stop-loss price">
       </div>
-
       <div class="input-group">
         <label for="risk-reward">Risk-to-Reward Ratio:</label>
         <select id="risk-reward">
@@ -38,27 +60,19 @@
           <option value="3">1:3</option>
         </select>
       </div>
+      <button id="calculate-pnl">Calculate PNL</button>
+      <div id="pnl-summary"></div>
     </div>
 
-    <!-- Buttons -->
-    <div class="button-group">
-      <button id="fetch-stock-price">Fetch Stock Price</button>
-      <button id="show-price-movements">Show Price Movements</button>
-    </div>
-
-    <!-- Results Section -->
+    <!-- Graph and Price Movements -->
     <div class="results-section">
-      <div id="risk-summary">
-        <!-- Risk summary will be displayed here -->
-      </div>
-
       <div class="graph-container">
         <canvas id="stockGraph"></canvas>
       </div>
+      <div id="price-movements"></div>
     </div>
   </div>
   <script src="script.js"></script>
 </body>
-</html>>
-
+</html>
 
